@@ -1,0 +1,3 @@
+# Fulltextové vyhledávání jako služba
+
+text práce...
