@@ -1,0 +1,3 @@
+# Název, cíle, metody
+
+...
