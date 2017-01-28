@@ -1,5 +1,9 @@
 # Název, cíle, metody
 
+## Název práce
+
+> Fulltextové vyhledávání jako služba
+
 
 ## Problém
 
@@ -32,3 +36,9 @@ E-shopy disponují nekvalitním fulltextovým vyhledáváním, které neumožňu
 3. _
   1. Rešerše literatury, srovnání
   2. Rešerše literatury, srovnání
+
+
+## Literatura
+
+- STROSSA, Petr, 2011. Počítačové zpracování přirozeného jazyka. Praha: Oeconomica. ISBN 978-80-245-1777-3.
+- CLINTON Gormley, ZACHARY Tong, 2015. Elasticsearch: The Definitive Guide. O'Reilly Media. ISBN 978-1-4493-5854-9.
