@@ -10,12 +10,17 @@
 E-shopy disponují nekvalitním fulltextovým vyhledáváním, které neumožňuje zpracování přirozeného jazyka, neporadí si s češtinou, vrací nerelevantní výsledky. Implementace vyhledávání, které by řešilo tyto problémy, je pro ně však nákladná.
 
 
-## Cíle
+# Cíl práce
+
+Cílem je vytvořit nástroj, který bude nabízen jako služba a umožní rychlou implementaci fulltextového vyhledávání do e-shopu. Nástroj bude načítat produkty z již používaných datových zdrojů a výsledky vyhledávání budou dostupné pomocí jednoduše implementovatelného API. Algoritmus vyhledávání bude možné parametrizovat pomocí grafického rozhraní. Důležitá je kvalita samotného vyhledávání, rychlost a snadnost implementace.
+
+
+## Dílčí cíle
 
 1. Vytvoření nástroje napojitelného na stávající podobu e-shopu
-  1. Návrh řešení
-  2. Nasazení aplikace do provozu
-  3. Ověření funkčnosti a přínosu
+  1. Návrh řešení (návrh architektury, návrh API, definice případů užití a průchodů aplikací)
+  2. Nasazení aplikace do provozu (programování, deployment)
+  3. Ověření funkčnosti a přínosu (testování stavu před/po na reálném e-shopu)
 2. Analýza potřeb zákazníků (e-shopů) v oblasti fulltextového vyhledávání na jejich webu
   1. Analýza současného stavu fulltextového vyhledávání vybraných e-shopů
   2. Analýza možností pokročilého fulltextového vyhledávání
@@ -42,3 +47,4 @@ E-shopy disponují nekvalitním fulltextovým vyhledáváním, které neumožňu
 
 - STROSSA, Petr, 2011. Počítačové zpracování přirozeného jazyka. Praha: Oeconomica. ISBN 978-80-245-1777-3.
 - CLINTON Gormley, ZACHARY Tong, 2015. Elasticsearch: The Definitive Guide. O'Reilly Media. ISBN 978-1-4493-5854-9.
+- KENNEDY William, 2016. Go in Action. Manning Publications Co. ISBN 978-1-6172-9178-4.
