@@ -10,9 +10,9 @@
 E-shopy disponují nekvalitním fulltextovým vyhledáváním, které neumožňuje zpracování přirozeného jazyka, neporadí si s češtinou, vrací nerelevantní výsledky. Implementace vyhledávání, které by řešilo tyto problémy, je pro ně však nákladná.
 
 
-# Cíl práce
+## Cíl práce
 
-Cílem je vytvořit nástroj, který bude nabízen jako služba a umožní rychlou implementaci fulltextového vyhledávání do e-shopu. Nástroj bude načítat produkty z již používaných datových zdrojů a výsledky vyhledávání budou dostupné pomocí jednoduše implementovatelného API. Algoritmus vyhledávání bude možné parametrizovat pomocí grafického rozhraní. Důležitá je kvalita samotného vyhledávání, rychlost a snadnost implementace.
+Cílem je vytvořit nástroj, který bude nabízen jako služba a umožní rychlou implementaci fulltextového vyhledávání do e-shopu. Nástroj bude načítat produkty z již používaných datových zdrojů a výsledky vyhledávání budou dostupné pomocí jednoduše implementovatelného API. Algoritmus vyhledávání bude možné parametrizovat pomocí grafického rozhraní. Důležitá je kvalita samotného vyhledávání, rychlost vyhledávání a snadnost implementace.
 
 
 ## Dílčí cíle
