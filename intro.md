@@ -46,7 +46,7 @@ Cílem je vytvořit nástroj, který bude nabízen jako služba a umožní rychl
 ## Literatura
 
 - STROSSA, Petr, 2011. Počítačové zpracování přirozeného jazyka. Praha: Oeconomica. ISBN 978-80-245-1777-3.
-- AYSE Göker a DAVIES John, 2009. Information Retrieval: Searching in the 21st Century. Library of Congress Cataloging-in-Publication Data. ISBN: 978-0-470-02762-2
+- AYSE Göker a DAVIES John, 2009. Information Retrieval: Searching in the 21st Century. Library of Congress Cataloging-in-Publication Data. ISBN: 978-0-470-02762-2.
 - AGGARWAL Charu C., ZHAI ChengXiang, 2000. Mining Text Data. Springer New York Dordrecht Heidelberg London. ISBN 978-1-4614-3222-7.
 - CLINTON Gormley, ZACHARY Tong, 2015. Elasticsearch: The Definitive Guide. O'Reilly Media. ISBN 978-1-4493-5854-9.
 - KENNEDY William, 2016. Go in Action. Manning Publications Co. ISBN 978-1-6172-9178-4.
