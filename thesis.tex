@@ -96,78 +96,61 @@ V~této diplomové práci práci...
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Samotna prace...}
+\chapter{Analýza byznys požadavků}
+- Vysvetleni problemu, ktery je resen
+- Specifika prostredi e-commerce, definice kontextu, ve kterem bude nastroj pouzivan
+- Definice pozadavku na samotne vyhledavani, akceptacni kriteria
+- Technicke pozadavky (datove formaty, rychlost odezvy...)
+- Popis oboru, kterych se prace dotyka (ziskavani informaci, NLP, big data...)
 
-\section{Analyza problemu a pozadavku na aplikaci}
+\chapter{Teorie fulltextového vyhledávání}
+- Popis problemu indexovani dokumentu
+- Analyza dat pouzitych k vyhledavani
+- Zpracovani prirozeneho jazyka
+  - Sklonovani, casovani, tvaroslovi obecne
+  - Vaha slov, stop slova
+  - Preklepy
+  - Synonyma, zargon
+  - Lemmatizace
+  - Tezaurus
 
-Vysvetleni problemu, ktery je resen
-Specifika prostredi e-commerce, definice kontextu, ve kterem bude nastroj pouzivan
-Definice pozadavku na samotne vyhledavani, akceptacni kriteria
-Technicke pozadavky (datove formaty, rychlost odezvy...)
-Popis oboru, kterych se prace dotyka (ziskavani informaci, NLP, big data...)
-Analyza problemu fulltextoveho vyhledavani
-
-\section{Fulltextove hledani obecne}
-
-\section{Indexace}
-
-Popis problemu indexovani dokumentu
-Analyza dat pouzitych k vyhledavani
-Zpracovani prirozeneho jazyka
-
-Sklonovani, casovani, tvaroslovi obecne
-Vaha slov, stop slova
-Preklepy
-Synonyma, zargon
-Lemmatizace
-Tezaurus
-Navrh reseni
+\chapter{Návrh řešení}
 
 \section{Nastroje pouzitelne pro fulltextove vyhledavani}
+- Popis a porovnani vhodnych nastroju
+  - MySQL
+  - Elasticsearch
+  - Sphinx
+  - Algolia
+  - Navrh architektury aplikace
 
-MySQL
-Elasticsearch
-Sphinx
-Algolia
-Navrh architektury aplikace
+\section{Návrh aplikace}
+- Definice pripadu uziti
+- Navrh architektury aplikace
+- Vyber technologii a nastroju (jazyk, framework...)
 
-Vyber technologii a nastroju
-Definice pripadu uziti
-Navrh architektury aplikace
-Implementace aplikace
+\chapter{Implementace}
 
 \section{Architektura aplikace}
-
-Popis sluzeb, modulu, vztahu mezi nimi
-Databaze
-
-Nastaveni a nasazeni Elasticsearch
-Implementace indexace
-Implementace vyhledavani
-Backend
-
-Popis trid, rozhrani, implementacni detaily
-Frontend
-
-Navrh, komunikace s backendem
-Deployment
-
-CI, nasazovani na server
+- Frontend vs backend (API)
+- Nastaveni a nasazeni Elasticsearch
+  - Implementace indexace
+  - Implementace vyhledavani
+- Backend: popis trid, rozhrani, implementacni detaily
+- Frontend: UI, komunikace s backendem
+- Deployment, CI
 
 \section{Testovani, overeni}
-
-Overeni funkcnosti a prinosu
-Testovani, zda jsou splnena akceptacni kriteria
-Porovnani s stavajicim resenim vyhledavani na konkretnim priklade
-Diskuse mozneho budouciho rozsirovani
-
-
+- Overeni funkcnosti a prinosu
+- Testovani, zda jsou splnena akceptacni kriteria
+- Porovnani s stavajicim resenim vyhledavani na konkretnim priklade
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Závěr}
 
-V této diplomové práci jsem nejprve nalezl zdroje dat...
+V této diplomové práci jsem...
+Diskuse mozneho budouciho rozsirovani
 
 \section{Dosažení vytčených dílů}
 ...
@@ -177,19 +160,19 @@ V této diplomové práci jsem nejprve nalezl zdroje dat...
 \begin{thebibliography}{Mm99}
 
 \bibitem{strossa} STROSSA, Petr. \emph{Počítačové zpracování přirozeného jazyka}. \\
-Vyd.~1. Praha: Oeconomica, 2011 000~s. ISBN 978-80-245-1777-3. % TODO: vydani a pocet stran
+Vyd.~1. Praha: Oeconomica, 2011 316~s. ISBN 978-80-245-1777-3.
 
 \bibitem{searching} AYSE Göker a DAVIES John. \emph{Information Retrieval: Searching in the 21st Century}. \\
-Library of Congress Cataloging-in-Publication Data, 2009. ISBN: 978-0-470-02762-2. % TODO: vydani a pocet stran
+Vyd.~1. Library of Congress Cataloging-in-Publication Data, 2009 295~s. ISBN: 978-0-470-02762-2.
 
 \bibitem{mining} AGGARWAL Charu C., ZHAI ChengXiang. \emph{Mining Text Data}. \\
-Springer New York Dordrecht Heidelberg London, 2000. ISBN 978-1-4614-3222-7. % TODO: vydani a pocet stran
+Springer New York Dordrecht Heidelberg London, 2000 522~s. ISBN 978-1-4614-3222-7.
 
 \bibitem{es-guide} CLINTON Gormley, ZACHARY Tong. \emph{Elasticsearch: The Definitive Guide}. \\
-O'Reilly Media, 2015. ISBN 978-1-4493-5854-9. % TODO: vydani a pocet stran
+O'Reilly Media, 2015 724~s. ISBN 978-1-4493-5854-9.
 
 \bibitem{go-in-action} KENNEDY William. \emph{Go in Action}. \\
-Manning Publications Co, 2016. ISBN 978-1-6172-9178-4. % TODO: vydani a pocet stran
+Manning Publications Co, 2016 264~s. ISBN 978-1-6172-9178-4.
 
 \bibitem{elastic-reference} Elasticsearch. \emph{Elasticsearch Reference} [online]. \\
 2017 [cit. 2017-03-03]. Dostupné z:\\

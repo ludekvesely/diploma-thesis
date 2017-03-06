@@ -4,5 +4,6 @@ thesis.out
 thesis.synctex.gz
 thesis.tex.bak
 thesis.toc
+*.bak
 # thesis.pdf
 
