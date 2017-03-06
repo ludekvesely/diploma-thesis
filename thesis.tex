@@ -1,0 +1,248 @@
+\documentclass[FM,DP]{tulthesis}
+
+\usepackage{polyglossia}
+\setdefaultlanguage{czech}
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{xltxtra}
+\setsansfont[Mapping=tex-text,BoldFont={* Bold},Numbers=OldStyle]{Myriad Pro}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=tul, urlcolor=tul, citecolor=tul}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[toc,page]{appendix}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\newcommand{\argument}[1]{{\ttfamily\color{\tulcolor}#1}}
+\newcommand{\prikaz}[1]{\argument{\textbackslash #1}}
+\newenvironment{myquote}{\begin{list}{}{\setlength\leftmargin\parindent}\item[]}{\end{list}}
+\newenvironment{listing}{\begin{myquote}\color{\tulcolor}}{\end{myquote}}
+\sloppy
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\TULtitle{Vyhledávání jako služba}{Search as a Service}
+\TULprogramme{Aplikovaná informatika}{Applied Informatics}
+\TULbranch{Informační systémy a technologie}{Information Technologies}
+\TULauthor{Bc. Luděk Veselý}
+\TULsupervisor{Prof. Ing. Zdeněk Molnár, CSc.}
+\TULyear{2017}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\ThesisStart{male}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstractCZ}
+Tato diplomová práce popisuje návrh a tvorbu fulltextového vyhledávání poskytovaného jako služba.
+\end{abstractCZ}
+
+\begin{klicovaslovaCZ}
+Fulltext, Elasticsearch
+\end{klicovaslovaCZ}
+
+\vspace{2cm}
+
+\begin{abstractEN}
+This diploma thesis describes creation of fulltext search service.
+\end{abstractEN}
+
+\begin{klicovaslovaEN}
+Fulltext, Elasticsearch
+\end{klicovaslovaEN}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{acknowledgement}
+Rád bych poděkoval Ing. Ivanovi Jelínkovi za rady a pomoc při řešení.
+\end{acknowledgement}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents
+\clearpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abbrList}
+\textbf{ES} & Elasticsearch\\
+\textbf{DBS} & Databázový systém\\
+\end{abbrList}
+
+
+
+
+
+
+%%%
+1 Úvod    .
+1.1 Cíle práce
+Cíle práce jsou následující:
+1.2 Cílová skupina
+Cílovou skupinou této práce jsou 
+1.3 Použité metody
+1.4 Struktura práce
+2 Komentovaná rešerše informačních zdrojů
+3 Kapitoly vlastního textu
+4 Závěr
+4.1 Dosažení vytčených dílů
+Bylo …
+%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Úvod}
+
+V~této diplomové práci práci popisuji postup nalezení veřejně přístupných zdrojů dat o~dopravních nehodách, stažení těchto dat, uložení dat ve vhodné databázi a možnost jejich využití v~dataminingové studii. Ministerstvo dopravy poskytuje od~roku 2006 v~rámci projektu Jednotná dopravní vektorová mapa \cite{jdvm} databázi dopravních nehod na~území ČR. Zde je možné nehody vyhledávat, zobrazit v~mapě a ke každé nehodě získat podrobný výpis. Data by však bylo možné využít efektivněji. Policie ČR sice pravidelně vytváří statistiky nehodovosti \cite{statistika-nehodovosti}, jde však pouze o~jednoduché promítnutí jednotlivých parametrů nehod do~grafu. Zpravidla se jedná o~zobrazení hodnot zkoumané veličiny v~daném období a porovnání s~předchozím obdobím:
+
+\begin{figure}[h]
+\center
+\includegraphics[width=\textwidth]{nehody-dny.png}
+\caption{Počty nehod v~jednotlivých dnech dle Policie ČR}
+\label{foto}
+\end{figure}
+
+V~první fázi podrobíme data shlukové analýze. Nalezenými shluky mohou být například:
+
+\begin{itemize}
+\item 1. shluk
+\begin{itemize}
+\item Značka vozidla: Škoda, Ford
+\item Charakteristika vlastníka vozidla: státní podnik, soukromá organizace
+\item Kategorie řidiče: s~řidičským oprávněním skupiny B
+\end{itemize}
+\item 2. shluk
+\begin{itemize}
+\item Charakteristika vlastníka vozidla: Mezinárodní kamionová doprava
+\end{itemize}
+\end{itemize}
+
+Nalezené shluky by poté byly rozděleny do~skupin dle následků odpovídajících nehod, tedy dle množství usmrcených osob, lehce zraněných osob, těžce zraněných osob, škody na~vozidle, celkové hmotné škody, případně úniku hmot.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Samotna prace...}
+
+\section{Analyza problemu a pozadavku na aplikaci}
+
+Vysvetleni problemu, ktery je resen
+Specifika prostredi e-commerce, definice kontextu, ve kterem bude nastroj pouzivan
+Definice pozadavku na samotne vyhledavani, akceptacni kriteria
+Technicke pozadavky (datove formaty, rychlost odezvy...)
+Popis oboru, kterych se prace dotyka (ziskavani informaci, NLP, big data...)
+Analyza problemu fulltextoveho vyhledavani
+
+\section{Fulltextove hledani obecne}
+
+\section{Indexace}
+
+Popis problemu indexovani dokumentu
+Analyza dat pouzitych k vyhledavani
+Zpracovani prirozeneho jazyka
+
+Sklonovani, casovani, tvaroslovi obecne
+Vaha slov, stop slova
+Preklepy
+Synonyma, zargon
+Lemmatizace
+Tezaurus
+Navrh reseni
+
+\section{Nastroje pouzitelne pro fulltextove vyhledavani}
+
+MySQL
+Elasticsearch
+Sphinx
+Algolia
+Navrh architektury aplikace
+
+Vyber technologii a nastroju
+Definice pripadu uziti
+Navrh architektury aplikace
+Implementace aplikace
+
+\section{Architektura aplikace}
+
+Popis sluzeb, modulu, vztahu mezi nimi
+Databaze
+
+Nastaveni a nasazeni Elasticsearch
+Implementace indexace
+Implementace vyhledavani
+Backend
+
+Popis trid, rozhrani, implementacni detaily
+Frontend
+
+Navrh, komunikace s backendem
+Deployment
+
+CI, nasazovani na server
+
+\section{Testovani, overeni}
+
+Overeni funkcnosti a prinosu
+Testovani, zda jsou splnena akceptacni kriteria
+Porovnani s stavajicim resenim vyhledavani na konkretnim priklade
+Diskuse mozneho budouciho rozsirovani
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Závěr}
+
+V této diplomové práci jsem nejprve nalezl zdroje dat...
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thebibliography}{Mm99}
+
+\bibitem{strossa} STROSSA, Petr. \emph{Počítačové zpracování přirozeného jazyka}. \\
+Vyd.~1. Praha: Oeconomica, 2011 000~s. ISBN 978-80-245-1777-3. % TODO: vydani a pocet stran
+
+\bibitem{searching} AYSE Göker a DAVIES John. \emph{Information Retrieval: Searching in the 21st Century}. \\
+Library of Congress Cataloging-in-Publication Data, 2009. ISBN: 978-0-470-02762-2. % TODO: vydani a pocet stran
+
+\bibitem{mining} AGGARWAL Charu C., ZHAI ChengXiang. \emph{Mining Text Data}. \\
+Springer New York Dordrecht Heidelberg London, 2000. ISBN 978-1-4614-3222-7. % TODO: vydani a pocet stran
+
+\bibitem{es-guide} CLINTON Gormley, ZACHARY Tong. \emph{Elasticsearch: The Definitive Guide}. \\
+O'Reilly Media, 2015. ISBN 978-1-4493-5854-9. % TODO: vydani a pocet stran
+
+\bibitem{go-in-action} KENNEDY William. \emph{Go in Action}. \\
+Manning Publications Co, 2016. ISBN 978-1-6172-9178-4. % TODO: vydani a pocet stran
+
+\bibitem{elastic-reference} Elasticsearch. \emph{Elasticsearch Reference} [online]. \\
+2017 [cit. 2017-03-03]. Dostupné z:\\
+\url{https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html}
+
+\end{thebibliography}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+\chapter{Obsah přiloženého DVD}
+
+\begin{itemize}
+\item Soubor Bakalarska\_prace\_2014\_Ludek\_Vesely.pdf
+\begin{itemize}
+	\item Text bakalářské práce
+\end{itemize}
+
+\end{itemize}
+
+\chapter{Relační model databázového systému}
+
+\begin{figure}[h]
+\center
+\includegraphics[width=0.86\textwidth]{relational.pdf}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
