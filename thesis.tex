@@ -66,77 +66,161 @@ Rád bych poděkoval Ing. Ivanovi Jelínkovi za rady a pomoc při řešení.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{abbrList}
-%\textbf{ES} & Elasticsearch\\
-%\textbf{DBS} & Databázový systém\\
-%\end{abbrList}
+\begin{abbrList}
+\textbf{fulltextové vyhledávání} & 
+Vyhledávání v indexovaných dokumentech, v české literatuře často označováno jako plnotextové vyhledávání\\
+\textbf{e-shop} & 
+Elektronický obchod\\
+\textbf{e-commerce} & 
+Elektronické obchodování, souhrnné označení obchodní činnosti prováděné na internetu\\
+\end{abbrList}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Úvod}
 
-V~této diplomové práci práci...
+V~této diplomové práci práci se zabývám návrhem a implementací nástroje, který umožní
+provozovatelům e~shopů snadnou a rychlou implementaci fulltextového vyhledávání. Při
+implementaci fulltextového vyhledávání je totiž třeba mít určitou znalost principů 
+samotného vyhledávání, souvisejících oborů a technologií. Implementace kvalitního vyhledávání
+tak může být pro provozovatele e-shopu náročná jak časově, tak finančně.
+
+V rámci své diplomové práce navrhuji a vytvářím nástroj, který řeší tyto problémy a 
+usnadňuje tak provozovatelům e-shopů spuštění vyhledávání. Konkrétní cíle diplomové práce
+popisuji v následující kapitole. V další kapitole volím metody, kterými dané cíle naplním.
 
 \section{Cíle práce}
-...
+
+Cílem práce je vytvořit nástroj, který bude nabízen jako služba a umožní rychlou implementaci
+fulltextového vyhledávání do e-shopu. K~dosažení tohoto cíle je třeba naplnit cíle dílčí.
+
+Prvním dílčím cíem je provedení analýzy problému a to jak z~pohledu byznysového, tak
+z pohledu samotné problematiky vyhledávání. Co se týče pohledu byznysu, tak bude třeba
+analyzovat potřeby zákazníků, zjistit, co je vlastně třeba vytvořit. Z~pohledu
+problematiky vyhledávání je pak třeba provést analýzu této problematiky a utřídit
+tak znalosti potřebné k poskytnutí kvalitních výsledků vyhledávání.
+
+Dalším dílčím cílem je vytvořit návrh řešení problému na základě znalosti potřeb
+zákazníků a dále na základě znalosti problematiky vyhledávání. Tento návrh bude v~dalším 
+kroku implementovatelný.
+
+Posledním dílčím cílem je implementace dle návrhu. Obnáší to výběr vhodných nástrojů
+a konečně také ověření samotnoé implementace. Tu je třeba porovnat vůči požadavkům, 
+aby se ověřilo, že byly splněny.
 
 \section{Cílová skupina}
-...
+
+První cílovou skupinou je vývojář, řešící problém fulltextového vyhledávání produktů 
+při implementaci elektronického obchodu. Takovému čtenáři by měla práce poskytnout dostatečné
+teoretické znalosti potřebné pro implementaci vyhledávání. Užitečná také může být konkrétní
+implementace, popisovaná v této práci.
+
+Další možnou cílovou skupinou je provozovatel e-shopu, který přemýšlí, jakým způsobem
+zlepšit fulltextové vyhledávání. V~této práci získá přehled o~složitosti samotné implementace,
+poskytne mu komentovaný soupis možných řešení problémů a případně poskytne funkční
+službu, kterou může okamžitě na~e-shop napojit.
+
+Poslední cílovou skupinou je kdokoli, kdo se zajímá o fulltextové vyhledávání a českém jazyce.
+V této práci nalezne soupis problémů souvisejicích s češtinou, které je třeba řešit. 
+Dále zde nalezne konkrétní implementaci, kterou se může inspirovat při řešení obdobného problému.
 
 \section{Použité metody}
-...
+
+V~této kapitole popisuji metody použité k~naplnění jednotlivých cílů. Pro zkoumání problému
+oboru provedu analýzu trhu, nabízí se také možnost dotazování potenciálních uživatelů.
+Pro porozumnění problematice vyhledávání provedu rešerši literatury. Vzhledem k množství
+dostupné literatury bude třeba provést syntézu těchto informací. Pro vytvoření 
+návrhu řešení bude použito ... Samotné vytvoření aplikace bude implementováno(?).
 
 \section{Struktura práce}
-...
+
+V první části práce popisuji problematiku vyhledávání v~prostředí e-commerce. Definuji zde 
+jednak kontext, v~kterém se pohybuji a popisuji problémy, které v~tomto prostředí řeším.
+Snažím se identifikovat potencionálního zákazníka a definovat jeho požadavky na~vyhledávání.
+Toto prostředí má svá specifika, která také popisuji. V~závěru této části porovnávám
+existující nástroje umožňující implementaci vyhledávání a zjišťuji tak, proč má smysl
+vytvářet další službu, jaká je její přidaná hodnota.
+
+V druhé části se zabývám samotnou problematikou fulltextového vyhledávání. Popisuji zde celý
+proces od analýzy vstupních dat, přes jejich indexaci, až po samotné vyhledávání. 
+Tyto poznatky budou následně využity k~naplnění požadavků na vyhledávání, k~zajištění
+kvalitních výsledků.
+
+V další části práce navrhuji samotnou aplikaci, aby vyhovovala požadavkům a zároveň byla 
+následně implementovatelná. Porovnávám zde dostupné nástroje, definuji příday užití aplikace
+a vytvářím model nástroje.
+
+V poslední části popisuji konkrétní implementaci v~jazyce Go s~pomocí databáze Elasticsearch.
+Výstupem této části je otestovaný spustitelný program, který umožňuje provádět indexaci produktů
+a jejich následné vyhledávání.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Komentovaná rešerše informačních zdrojů}
-...
+%\chapter{Komentovaná rešerše informačních zdrojů}
+%...
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Analýza byznys požadavků na aplikaci}
-- Vysvetleni problemu, ktery je resen\\
-- Specifika prostredi e-commerce, definice kontextu, ve kterem bude nastroj pouzivan\\
-- Definice pozadavku na samotne vyhledavani, akceptacni kriteria\\
-- Technicke pozadavky (datove formaty, rychlost odezvy...)\\
-- Popis oboru, kterych se prace dotyka (ziskavani informaci, NLP, big data...)
 
+\section{Vysvětlení problému, který je řešen}
+
+\section{Specifika prostředí e-commerce}
+- Specifika prostredi e-commerce, definice kontextu, ve kterem bude nastroj pouzivan
+
+\section{Definice požadavků na vyhledávání}
+- Definice pozadavku na samotne vyhledavani, akceptacni kriteria
+
+\section{Technické požadavky na aplikaci}
+- Technicke pozadavky (datove formaty, rychlost odezvy...)
+
+\section{Popis oborů, kterých se práce dotýká}
+- Ziskavani informaci, NLP, big data...
+
+\section{Existující služby umožnující implementaci vyhledávání}
+- Algolia, AWS CloudSearch...
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Teorie fulltextového vyhledávání}
-- Popis problemu indexovani dokumentu\\
-- Analyza dat pouzitych k vyhledavani\\
-- Zpracovani prirozeneho jazyka\\
+
+\section{Indexace dokumentů}
+
+\section{Analýza dat, v kterých bude vyhledáváno}
+
+\section{Zpracování přirozeného jazyka}
+- NLP\\
 - Sklonovani, casovani, tvaroslovi obecne\\
-\hspace*{5mm}- Vaha slov, stop slova\\
-\hspace*{5mm}- Preklepy\\
-\hspace*{5mm}- Synonyma, zargon\\
-\hspace*{5mm}- Lemmatizace\\
-\hspace*{5mm}- Tezaurus
+- Vaha slov, stop slova\\
+- Preklepy\\
+- Synonyma, zargon\\
+- Lemmatizace\\
+- Tezaurus\\
+- ...
 
 \chapter{Návrh řešení}
 
-\section{Nastroje pouzitelne pro fulltextove vyhledavani}
+\section{Nástroje použitelné pro fulltextové vyhledáváni}
 - Popis a porovnani vhodnych nastroju\\
 \hspace*{5mm}- MySQL\\
 \hspace*{5mm}- Elasticsearch\\
 \hspace*{5mm}- Sphinx\\
-\hspace*{5mm}- Algolia\\
-\hspace*{5mm}- Navrh architektury aplikace
+\hspace*{5mm}- ...
 
-\section{Návrh aplikace}
-- Definice pripadu uziti\\
-- Navrh architektury aplikace
+\section{Definice případů užití}
+- Uzivatel zada XML\\
+- Uzivatel vyhleda
+- ...
+
+\section{Návrh architektury aplikace}
+- Frontend vs backend (API)...
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementace}
 - Vyber technologii a nastroju (jazyk, framework...)
 
-\section{Architektura aplikace}
-- Frontend vs backend (API)
-
-\section{Nastaveni a nasazeni Elasticsearch}
+\section{Nastavení a nasazení Elasticsearch}
 - Implementace indexace\\
 - Implementace vyhledavani
 
@@ -149,7 +233,7 @@ V~této diplomové práci práci...
 \section{Deployment}
 - Deployment, CI
 
-\section{Testovani, overeni}
+\section{Testování, ověření}
 - Overeni funkcnosti a prinosu\\
 - Testovani, zda jsou splnena akceptacni kriteria\\
 - Porovnani s stavajicim resenim vyhledavani na konkretnim priklade
@@ -157,12 +241,12 @@ V~této diplomové práci práci...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Závěr}
-
-V této diplomové práci jsem...\\
-\\
-Diskuse mozneho budouciho rozsirovani
+V této diplomové práci jsem...
 
 \section{Dosažení vytčených dílů}
+...
+
+\section{Diskuze možného budoucího rozšiřování}
 ...
 
 
