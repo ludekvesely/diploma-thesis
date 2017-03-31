@@ -5,5 +5,4 @@ thesis.synctex.gz
 thesis.tex.bak
 thesis.toc
 *.bak
-# thesis.pdf
-
+.DS_Store
