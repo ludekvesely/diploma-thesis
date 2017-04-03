@@ -106,7 +106,7 @@
 \newlength{\title@line}
 
 
-\newcommand{\ThesisTitle}[1]{{\thispagestyle{empty}\sffamily
+\newcommand{\ThesisTitle}[1]{{\thispagestyle{empty}
 
 \begin{center}
 \bfseries
@@ -125,7 +125,8 @@
 \begin{center}
 \ifthenelse{\equal{#1}{EN}}{Study programme}{Studijn\'\i\ program}: 
 \ifthenelse{\equal{#1}{EN}}{\TUL@programEN}{\TUL@programCZ} \\
-\ifthenelse{\equal{#1}{EN}}{Study branch}{Studijn\'\i\ obor}: 
+\vspace{2mm}
+\ifthenelse{\equal{#1}{EN}}{Branch}{Obor}: 
 \ifthenelse{\equal{#1}{EN}}{\i@TULoborEN}{\i@TULoborCZ}
 \end{center}
 
@@ -134,8 +135,8 @@
 \vfill
 
 \begin{center}
-\Huge\bfseries
-\ifthenelse{\equal{#1}{EN}}{\MakeUppercase{\TUL@nazevEN}}{\MakeUppercase{\TUL@nazevCZ}}
+\HUGE\bfseries
+\ifthenelse{\equal{#1}{EN}}{\TUL@nazevEN}{\TUL@nazevCZ}
 \par
 \end{center}
 
@@ -153,10 +154,10 @@
 
 \list{}{\leftmargin=3.4cm}\item[]
 \large\noindent\begin{tabularx}{\linewidth}{@{}lX@{}}
-\itshape\color{tulgray}%
+\color{tulgray}%
 \ifthenelse{\equal{#1}{EN}}{Student}{Student}: &
 \TUL@autor \\
-\itshape\color{tulgray}%
+\color{tulgray}%
 \ifthenelse{\equal{#1}{EN}}{Supervisor}{Vedouc\'\i}: &
 \TUL@vedouci \\
 \end{tabularx}
@@ -232,5 +233,5 @@ Prohla\v suji, \v ze jsem diplomovou pr\'aci zpracoval samostatn\v e a \v ze jse
 \cleardoublepage}
 
 \titleformat{\chapter}%
-{\normalfont\sffamily\LARGE\bfseries}{\thechapter}{1em}{}
+{\normalfont\LARGE\bfseries}{\thechapter}{1em}{}
 

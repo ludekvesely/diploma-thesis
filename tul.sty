@@ -103,7 +103,7 @@
 % sestaveni adresy
 \newsavebox{\@drb@x}
 \newlength{\@drwidth}
-\newcommand{\makef@@tadr}{\ifthenelse{\boolean{addr@foot}}{\savebox{\@drb@x}{{\footnotesize\sffamily
+\newcommand{\makef@@tadr}{\ifthenelse{\boolean{addr@foot}}{\savebox{\@drb@x}{{\footnotesize
     \begin{tabular}[c]{@{}l@{}}
     \prvnir@dek
     \druhyr@dek
@@ -128,13 +128,13 @@
 {\makebox[0pt][l]{\raisebox{-0.2em}[0pt][0pt]{\hspace{\oddp@geshift}\b@tt@mtext}}%
 \color{\tulcolor}\rule{\oddsp@jline}{1pt}}%
 \spojovaci\hspace{3mm}\parbox{10cm}{\color{\tulcolor}\rule{10cm}{1cm}}%
-\hspace{-97mm}\parbox{97mm}{\color{white}\sffamily\bfseries\TULp@geno}}}
+\hspace{-97mm}\parbox{97mm}{\color{white}\bfseries\TULp@geno}}}
 % zapati sudych stranek
 \if@twoside
 \fancyfootoffset[E]{\evenp@geshift}
 \fancyfoot[LE]{\vspace*{0mm}\makebox[\paperwidth][l]{%
 \parbox{\evenp@geshift}{\makebox[\evenp@geshift][r]{\color{\tulcolor}\rule{10cm}{1cm}\hspace{3mm}}}%
-\parbox{0pt}{\makebox[0pt][r]{\color{white}\sffamily\bfseries\TULp@geno\hspace{6mm}}}%
+\parbox{0pt}{\makebox[0pt][r]{\color{white}\bfseries\TULp@geno\hspace{6mm}}}%
 \spojovaci
 \parbox{\evensp@jline}{\makebox[0pt][l]{\raisebox{-0.2em}[0pt][0pt]{\hspace{3mm}\b@tt@mtext}}%
 \color{\tulcolor}\rule{\evensp@jline}{1pt}}
@@ -190,11 +190,13 @@
 \newcommand{\oddel}{{\color{\tulcolor}\rule{1pt}{1.7ex}}}
 
 % styl a barva nadpisu
-\RequirePackage[sf, bf]{titlesec}
-\@ifundefined{chapter}{}{\titleformat*{\chapter}{\sffamily\bfseries\LARGE}}
-\@ifundefined{section}{}{\titleformat*{\section}{\sffamily\bfseries\Large}}
+\RequirePackage[bf]{titlesec}
+\@ifundefined{chapter}{}{\titleformat*{\chapter}{\bfseries\LARGE}}
+\@ifundefined{section}{}{\titleformat*{\section}{\bfseries\Large}}
 
 % titulni stranka
+\newcommand\HUGE{\@setfontsize\Huge{34}{43}}
+
 \newsavebox{\@uthb@x}
 \newlength{\@uthwidth}
 \newlength{\@uthheight}
@@ -207,7 +209,7 @@
 \newlength{\tul@tmp}
 
 \newcommand{\create@uthb@x}[1]{%
-\savebox{\@uthb@x}{\textbf{\color{\tulcolor}\sffamily\Large\renewcommand{\arraystretch}{1.3}%
+\savebox{\@uthb@x}{\textbf{\color{\tulcolor}\Large\renewcommand{\arraystretch}{1.3}%
 \begin{tabular}{@{\hspace{1.5em}}r@{}}\vspace{-0.7em}\\#1\\\vspace{-0.7em}\end{tabular}}}%
 \settowidth{\@uthwidth}{\usebox{\@uthb@x}}%
 \addtolength{\@uthwidth}{\paperwidth}%
@@ -249,7 +251,7 @@
 \newcommand{\TULtitlepage}[3]{{%
 \fancyhead{}
 \create@uthb@x{#2}%
-\raisebox{0pt}[0pt][0pt]{\logo}\par\sffamily
+\raisebox{0pt}[0pt][0pt]{\logo}\par
 \vfill
 %nazev
 \begin{flushright}
@@ -293,7 +295,7 @@
 \addtolength{\vertsize}{\date@height}%
 \raisebox{-\vertshift}[0pt][0pt]{\makebox[0pt][l]{\color{\tulcolor}\hspace{-\oddp@geshift}%
 \rule{\paperwidth}{\vertsize}}}%
-\raisebox{0pt}[0pt][0pt]{\logo}\par\sffamily
+\raisebox{0pt}[0pt][0pt]{\logo}\par
 \vfill
 %nazev
 \usebox{\titleb@x}
