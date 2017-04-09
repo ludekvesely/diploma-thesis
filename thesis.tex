@@ -472,7 +472,7 @@ získaných dokumentů a pochopení způsobu vyhledávání dotaz upravit.
 \section{Analýza dat, v kterých bude vyhledáváno}
 
 Nejprve je třeba prozkoumat data, ve kterých bude vyhledávání prováděno. Vycházím
-ze~skutečnosti, že naprostá většina elektronických obchodů své zvoží nabízí také 
+ze~skutečnosti, že naprostá většina elektronických obchodů své zboží nabízí také 
 prostřednictvím srovnávačů zboží, přičemž v počtu návštěv a tedy celkovém provozu 
 v~rámci českého internetu jsou nejdůležitější Heureka.cz a Zboží.cz \cite{netmonitor}. 
 
@@ -522,9 +522,9 @@ dle použetého formátu feedu a dle pečlivosti provozovatele obchodu.
 
 \section{Automatické indexování textů}
 
-Indexování je proces, kdy jsou ukládány textové dokumenty určené k vyhledání.
-Ukládány jsou použe výrazy, podle nichž by měl být ukládaný dokument vyhledatelný. 
-Místo, kam jsou tyto výrazy ukládány se nazývá index. Jedná se vlastně o klíče, 
+Indexace je proces, kdy jsou ukládány textové dokumenty určené k vyhledání.
+Ukládány jsou použe výrazy, podle nichž by měl být ukládaný dokument vyhledatelný, 
+místo kam jsou tyto výrazy ukládány se nazývá index. Jedná se vlastně o klíče, 
 podle kterých bude bude možné rychle hledaný záznam nalézt. To je důležité z hlediska
 rychlosti vyhledávání -- není možné všechny uložené záznamy procházet a analyzovat
 až ve chvíli vyhledávání. 
@@ -545,9 +545,9 @@ ovoce, například jablko.
 
 \section{Specifika českého jazyka}
 
-Vzhledem k tomu, že je vyhledávání vytvářeno pro čecké internetové obchody, 
-bude veškeré vyhledávání probíhat v českém jazyce, proto nyní popíšu jeho specifika.
-Český jazyk pracuje se slovy odlišně než jiné jazyky. Dále dochází k drobným
+Vzhledem k tomu, že je vyhledávání vytvářeno pro české internetové obchody, 
+bude veškeré vyhledávání probíhat v českém jazyce, a proto nyní popíši jeho specifika.
+Český jazyk pracuje se slovy odlišně než jiné jazyky. Dochází i k drobným
 odchylkám i v rámci českého jazyka na základě geografické oblasti (nářečí)
 nebo na základě zaměření dané skupiny lidí (hantýrka). Dále se můžeme zabývat
 grafickou podobou jazyka (morfologií) nebo jeho zvukovou podobou (fonetikou).
@@ -574,7 +574,7 @@ informaci nepřímo.
 V rámci ohebnosti lze rozlišovat jakým způsobem jsou ohýbána. Slovesa mohou být
 časována, příslovce mohou být stupňována, podstatná jména, přídavná jména, zájmena
 a číslovky mohou být skloňována. Dále v češtině rozlišujeme tři jmenné rody
-(mužský, ženský a střední) a dvě čísla (jednotné a množné). U sloves dále 
+(mužský, ženský a střední) a dvě čísla (jednotné a množné). U sloves navíc 
 rozlišujeme jejich vid.
 
 \section{Problematika tvarosloví}
@@ -582,8 +582,8 @@ rozlišujeme jejich vid.
 První problém související s zpracováním přirozeného jazyka je vypořádání se s tvaroslovím
 (morfologií). Jednotlivá slova se v českých textech objevují v různých slovních tvarech, 
 málokdy jsou všechna slova v základním tvaru. Například jeden produkt může mít název
-"Alex Čistič na laminát s pomerančovým olejem" i "Alex čistič na laminát pomerančový olej".
-V obou případech je uveden pomeranč, jen v různém tvaru. Při vyhledávání však
+\textbf{Alex Čistič na laminát s pomerančovým olejem} i \textbf{Alex čistič na laminát pomerančový olej}.
+V obou případech je uveden \textbf{pomeranč}, jen v různém tvaru. Při vyhledávání však
 chceme docílit toho, aby byla obě slova vyhledatelná shodně, ať už bude slovo pomeranč
 zadáno v kterémkoli pádě. Typické řešení je vřazení modulu do procesu indexace dokumentů nebo 
 dotazů, který sjednocuje podobu zadaných slov.
@@ -619,11 +619,11 @@ kategorií.
 \subsection{Operátor pravostranného rozšíření}
 
 Nejjednodušším řešením problematiky ohýbání slov je operátor pravostranného rozšíření.
-Mějme slovo svíčka, které se při skloňování v jednotném čísle mění na svíčky, svíčce, 
+Mějme slovo \textbf{svíčka}, které se při skloňování v jednotném čísle mění na svíčky, svíčce, 
 svíčku, svíčko, svíčce, svíčkou. V tomto příkladu lze vypozorovat, že se mění
-pouze konec slova, zatímco levá část \textbf{svíčk-} zůstává stejná. Tento přístup bude 
+pouze konec slova, zatímco levá část \textbf{svíč-} zůstává stejná. Tento přístup bude 
 sice poměrně úspěšný, nicméně se nevyhneme případům, kdy bude mít více slov stejný
-základní tvar. Mohli bychom tak při vyhledání výrazu \textbf{svíčk} obdržet dokumenty
+základní tvar. Mohli bychom tak při vyhledání výrazu \textbf{svíčk} obdržet i dokumenty
 obsahující slovo \textbf{svíčková}.
 
 Vzhledem k jednoduchosti a zároveň poměrně vysoké úspěšnosti bývá tento přístup
@@ -644,7 +644,7 @@ takový výraz odpovídá například i slovu \textbf{kaňka}.
 
 Derivátor slovních tvarů je nástroj, který namísto daného slova vygeneruje 
 všechny jeho gramatické tvary, případně jeho použitelné odvozeniny. 
-Ty jsou následně používány jako jejich logická disjunkce. Například místo 
+Ty jsou následně použity jako jejich logická disjunkce. Například místo 
 slova \verb|svíčka| by se použilo:
 
 \begin{figure}[thp]
@@ -657,8 +657,8 @@ slova \verb|svíčka| by se použilo:
 \end{minipage}
 \end{figure}
 
-Takový systém musí obsahovat co nejpřesnější sadu pravidel, jak vytvářet
-veškeré tvary zadaného slova. Dale je třeba k expandovanému slovu zadat
+Takový nástroj musí obsahovat co nejpřesnější sadu pravidel, jak vytvářet
+veškeré tvary zadaného slova. Dále je třeba k expandovanému slovu zadat
 jeho veškeré informace, aby mohlo být vybráno správné pravidlo.
 
 \subsection{Stematizace}
@@ -667,8 +667,8 @@ Stematizace je proces, kdy je slovo převáděno na jeho kmen (stem). Toho je do
 odstraněním předpon, přípon a koncovek. Její použití je vhodné pro jazyky, 
 které mění slova jen tímto způsobem (např. Angličtina). Pro češtinu je však stematizace
 hůře aplikovatelná, protože se slova ohýbají podle složitějších pravidel, ne jen
-změnou předpon, přípon nebo koncovek. Stematizaci tedy využít při hledání základního
-tvaru slova v českém jazyce, je ale nutné ji rozšířit o další procesy, které jsou 
+změnou předpon, přípon nebo koncovek. Stematizaci tedy lze využít při hledání základního
+tvaru slova i v českém jazyce, je ale nutné ji rozšířit o další procesy, které jsou 
 popisovány dále.
 
 \subsection{Lematizace}
@@ -676,10 +676,10 @@ popisovány dále.
 Lematizátor je nástroj, který převádí slovo na jeho základní gramatický tvar, tzv. lemma.
 Základním gramatickým tvarem se roumí první pád jednotného čísla u podstatných jmen nebo infnitiv 
 u sloves. Celý proces se nazývá lematizace a kromě převodu na základní tvar může lematizátor
-disponovat doplňkovou funkcí, kdy pro daný tvar poskytne i jeho tvaru, například 
+disponovat doplňkovou funkcí, kdy pro daný tvar poskytne i jeho vlastnosti, například 
 slovní druh, pád nebo číslo. Lematizátor pracuje v podstatě opačně ve srovnání s derivátorem. 
 Lematizace zároveň není totéž co stematizace, které předpokládá, že dochází 
-jen k přidávání předpon a přípon. Lematizátor jej vpodstatě rozšiřuje, odstranění
+jen k přidávání předpon a přípon. Lematizátor jej vlastně rozšiřuje, odstranění
 předpon nebo přípon však může být jednou jeho z činností. Především ale počítá s~tím, 
 že se koncovky nebo kmeny slov mohou měnit, což je důležité pro češtinu.
 Dalším rozdílem je výsledek daného procesu -- po stematizaci může vzniknout díky ořezání
@@ -784,9 +784,9 @@ vztahů které popisuje propracovanější než jen seznam synonym. Lze jej vyu�
 i pro neobvyklá slova, jako je žargón nebo další expresivní výrazy.
 
 Vytvoření takového slovníku je závislé na oblasti, pro kterou je vytvářen. Například 
-slovo \textbf{oko} bude nahraditelné jinými slovy v kontextu gastronomie, jinými 
-slovy v oboru biologie. Nelze tedy využívat jeden takový slovník globálně pro
-veškeré vyhledávání, je třeba zohlednit obor, ve kterém bude využíván.
+slovo \textbf{oko} bude nahraditelné jinými slovy v kontextu gastronomie a jinými 
+slovy v oboru biologie. Nelze tedy bezmyšlenkovitě používat jeden takový slovník globálně 
+pro veškeré vyhledávání, je třeba zohlednit obor, ve kterém bude využíván.
 
 \section{Přibližné vyhledávání}
 
@@ -810,7 +810,7 @@ k této problematice lze i jednoduším přístupem -- generováním n-gramů.
 
 Editační vzdálenost je způsob, jak vyjádřit podobnost dvou textových řetězců. Je
 vyjádřena jako celé číslo, které udává počet operací nutný pro transformaci z~jednoho
-třetového řetězce na druhý. Editačních vzdáleností pro textové vyhledávání je více, 
+textového řetězce na druhý. Editačních vzdáleností pro textové vyhledávání je více, 
 podle toho, jaké operace na textovém řetězci umožňují.
 
 V roce 1965 Vladimir Levenshtein definoval \textbf{Levenshteinovu vzdálenost} jako počet
@@ -823,7 +823,7 @@ Konkrétně šlo o~úpravy:
 \item Odstranění jednoho znaku: \textbf{jblko} \textrightarrow ~\textbf{jablko}
 \end{itemize}
 
-Frederick Damerau ji později rozšířil o další transformaci, která shodnou váhu:
+Frederick Damerau ji později rozšířil o další transformaci, která má shodnou váhu:
 
 \begin{itemize}
 \item Prohození dvou znaků: \textbf{jbalko} \textrightarrow ~\textbf{jablko}
