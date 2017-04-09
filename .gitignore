@@ -7,3 +7,4 @@ thesis.toc
 texput.log
 *.bak
 .DS_Store
+_minted-thesis

@@ -216,7 +216,7 @@ Prohla\v suji, \v ze jsem diplomovou pr\'aci zpracoval samostatn\v e a \v ze jse
 
 \newenvironment{abstractCZ}{\begin{uzky@text}\section*{Abstrakt}}{\end{uzky@text}}
 
-\newenvironment{klicovaslovaCZ}{\begin{uzky@text}\section*{Klíčová slova}}{\end{uzky@text}}
+\newenvironment{klicovaslovaCZ}{\begin{uzky@text}\section*{Klíčová slova}}{\end{uzky@text}\clearpage}
 
 \newenvironment{abstractEN}{\begin{uzky@text}\section*{Abstract}}%
 {\end{uzky@text}}
