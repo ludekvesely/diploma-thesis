@@ -59,6 +59,9 @@
 \newcommand{\TUL@vedouci}{Chyb\'\i\ \textbackslash TULsupervisor\{jm\'eno\}}
 \newcommand{\TULsupervisor}[1]{\renewcommand{\TUL@vedouci}{#1}}
 
+\newcommand{\TUL@oponent}{Chyb\'\i\ \textbackslash TULreader\{jm\'eno\}}
+\newcommand{\TULreader}[1]{\renewcommand{\TUL@oponent}{#1}}
+
 \newcommand{\TUL@programCZ}{Chyb\'\i\ \textbackslash TULprogramme\{k\'od\}\{\v{c}esky\}\{anglicky\}}
 \newcommand{\TUL@programEN}{Study Programme}
 \newcommand{\TULprogramme}[2]{\renewcommand{\TUL@programCZ}{#1}%
@@ -160,6 +163,9 @@
 \color{tulgray}%
 \ifthenelse{\equal{#1}{EN}}{Supervisor}{Vedouc\'\i}: &
 \TUL@vedouci \\
+\color{tulgray}%
+\ifthenelse{\equal{#1}{EN}}{Reader}{Oponent}: &
+\TUL@oponent \\
 \end{tabularx}
 \endlist
 \list{}{\leftmargin=-3.1cm}\item[]
@@ -196,11 +202,13 @@
 
 Prohla\v suji, \v ze jsem diplomovou pr\'aci zpracoval samostatn\v e a \v ze jsem uvedl v\v sechny pou\v zit\'e prameny a literaturu, ze kter\'e jsem \v cerpal.
 
-\vspace{1cm}
-\noindent Datum:
+\vspace{2cm}
 
-\vspace{1cm}
-\noindent Podpis:
+\begin{tabular}{ L{55mm} C{57mm} }
+ V Praze dne 23. 4. 2017 & ................................................. \\
+  & Luděk Veselý
+\end{tabular}
+
 \end{uzky@text}
 \cleardoublepage
 }
@@ -208,8 +216,8 @@ Prohla\v suji, \v ze jsem diplomovou pr\'aci zpracoval samostatn\v e a \v ze jse
 
 \newcommand{\ThesisStart}[1]{
 \ThesisTitle{CZ}
-\ThesisTitle{EN}
-\Assignment
+%\ThesisTitle{EN}
+%\Assignment
 \Declaration{#1}
 }
 
@@ -221,7 +229,7 @@ Prohla\v suji, \v ze jsem diplomovou pr\'aci zpracoval samostatn\v e a \v ze jse
 \newenvironment{abstractEN}{\begin{uzky@text}\section*{Abstract}}%
 {\end{uzky@text}}
 
-\newenvironment{klicovaslovaEN}{\begin{uzky@text}\section*{Key words}}{\end{uzky@text}\clearpage}
+\newenvironment{klicovaslovaEN}{\begin{uzky@text}\section*{Keywords}}{\end{uzky@text}\clearpage}
 
 \newenvironment{acknowledgement}{\begin{uzky@text}\section*{Pod\v ekov\'an\'{\i}}}%
 {\end{uzky@text}\clearpage}

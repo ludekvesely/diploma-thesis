@@ -1,5 +1,6 @@
 \documentclass[FM,DP]{tulthesis}
 
+% fonts, langs, packages...
 \usepackage{polyglossia}
 \setdefaultlanguage{czech}
 \usepackage{fontspec}
@@ -9,22 +10,40 @@
 \usepackage{hyperref}
 \hypersetup{colorlinks=true, linkcolor=tul, urlcolor=tul, citecolor=tul}
 \usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{booktabs}
 \usepackage{listings}
 \usepackage[toc,page]{appendix}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{minted}
-
-%\usepackage{xpatch,letltxmacro}
-%\LetLtxMacro{\cminted}{\minted}
-%\let\endcminted\endminted
-%\xpretocmd{\cminted}{\RecustomVerbatimEnvironment{Verbatim}{BVerbatim}{}}{}{}
-
 \newcommand{\argument}[1]{{\ttfamily\color{\tulcolor}#1}}
 \newcommand{\prikaz}[1]{\argument{\textbackslash #1}}
 \newenvironment{myquote}{\begin{list}{}{\setlength\leftmargin\parindent}\item[]}{\end{list}}
-%\newenvironment{listing}{\begin{myquote}\color{\tulcolor}}{\end{myquote}}
 \sloppy
+
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+% syntax highlighting
+\usepackage[newfloat]{minted}
+\usepackage[labelfont=bf,font=it]{caption}
+\usepackage{etoolbox}
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\setminted{bgcolor=bg, frame=single, rulecolor=\color{bg}, breaklines=true}
+\makeatletter
+\patchcmd{\minted@colorbg}{\noindent}{\medskip\noindent}{}{}
+\apptocmd{\endminted@colorbg}{\par\medskip}{}{}
+\makeatother
+\newenvironment{code}
+    {\filbreak\captionsetup{type=listing}}{\filbreak}
+\SetupFloatingEnvironment{listing}{name=Výpis}
+
+% brak lines in \url{}
+\makeatletter
+\g@addto@macro{\UrlBreaks}{\UrlOrds}
+\makeatother
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,61 +52,75 @@
 \TULbranch{Informační systémy a technologie}{Information Technologies}
 \TULauthor{Bc. Luděk Veselý}
 \TULsupervisor{Prof. Ing. Zdeněk Molnár, CSc.}
+\TULreader{...}
 \TULyear{2017}
+
+\renewcommand{\listlistingname}{Seznam výpisů programů}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
+\pagenumbering{gobble}
 \ThesisStart{male}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{abstractCZ}
-Tato diplomová práce popisuje návrh a tvorbu fulltextového vyhledávání poskytovaného jako služba.
-\end{abstractCZ}
+\begin{acknowledgement}
+Rád bych poděkoval Prof. Ing. Zdeňkovi Molnárovi, CSc. za vedení mé diplomové práce
+a Ing. Ivanovi Jelínkovi za rady a pomoc při jejím řešení.
+\end{acknowledgement}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstractCZ}
+Tato diplomová práce popisuje návrh a tvorbu plnotextového vyhledávání, které je poskytováno jako služba.
+Vyhledávání je určeno pro použití v elektronických obchodech a zaměřuje se na rychlost a snadnost
+implementace. Při vyhledávání jsou řešeny problémy související s počítačový zpracováním přirozeného
+jazyka.
+\end{abstractCZ}
+\vspace{1cm}
 \begin{klicovaslovaCZ}
-Fulltext, Elasticsearch
+Plnotextové vyhledávání, Software jako služba, Elektronický obchod, Elasticsearch
 \end{klicovaslovaCZ}
 
 \vspace{2cm}
 
 \begin{abstractEN}
-This diploma thesis describes creation of fulltext search service.
+This diploma thesis describes design and implementation of full text search service.
+Searching is intended for e-shops and aims to fast and simple implementation.
+Search solves problems related to natural language processing.
 \end{abstractEN}
-
+\vspace{1cm}
 \begin{klicovaslovaEN}
-Fulltext, Elasticsearch
+Full text search, Software as a service, E-shop, Elasticsearch
 \end{klicovaslovaEN}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{acknowledgement}
-Rád bych poděkoval Ing. Ivanovi Jelínkovi za rady a pomoc při řešení.
-\end{acknowledgement}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{roman}
+\setcounter{page}{2}
+\addcontentsline{toc}{chapter}{Obsah}
 \tableofcontents
+\clearpage
+
+% obrazky
+\addcontentsline{toc}{chapter}{Seznam obrázků}
+\listoffigures
+\clearpage
+
+% tabulky
+\addcontentsline{toc}{chapter}{Seznam tabulek}
+\listoftables
+\clearpage
+
+% vypisy programu
+\addcontentsline{toc}{chapter}{Seznam výpisů programů}
+\listoflistings
 \clearpage
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{abbrList}
-\textbf{URL} & 
-Uniform Resource Locator, adresa dokumentu na webu\\
-\textbf{XML} & 
-Extensible Markup Language, značkovací jazyk\\
-\textbf{EAN} & 
-European Article Number, mezinárodní číselná identifikace výrobků\\
-\textbf{ISBN} & 
-International Standard Book Number, číselná identifikace knižních vydání\\
-\textbf{SQL} & 
-Structured Query Language, jazyk určený pro práci s relačními databázemi\\
-\end{abbrList}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
 \chapter{Úvod}
 
 V~této diplomové práci práci se zabývám návrhem a implementací nástroje, který umožňuje
@@ -100,8 +133,9 @@ Konkrétní cíle diplomové práce popisuji v následujících odstavcích.
 
 \section{Cíle práce}
 
-Cílem práce je vytvořit nástroj, který je nabízen jako služba a umožňuje snadnou implementaci
-plnotextového vyhledávání do elektronického obchodu. K~dosažení tohoto cíle je třeba naplnit cíle dílčí.
+Cílem práce je vytvořit nástroj, který je nabízen jako služba a umožňuje provozovatelům elektronichých
+obchodů snadnou implementaci plnotextového vyhledávání do elektronického obchodu, které 
+K~dosažení tohoto cíle je třeba naplnit cíle dílčí.
 
 Prvním dílčím cíem je provedení analýzy problému a to jak z~pohledu byznysového, tak
 z~pohledu samotné problematiky vyhledávání. Co se týče pohledu byznysového, tak je třeba
@@ -114,10 +148,13 @@ Dalším dílčím cílem je vytvořit návrh řešení problému jednak na zák
 zákazníků a také na základě znalosti problematiky plnotextového vyhledávání. Tento návrh musí 
 být v~dalším kroku implementovatelný.
 
-Posledním dílčím cílem je samotná implementace aplikace dle jejího návrhu. Obnáší to výběr 
+Předposledním dílčím cílem je samotná implementace aplikace dle jejího návrhu. Obnáší to výběr 
 vhodných nástrojů, jejich nasazení do produkčního prostředí, naprogramování jednotlivých
 služeb a konečně také ověření samotné implementace. Tu je třeba porovnat vůči požadavkům
 a ověřit tak jejich naplnění.
+
+Posledním dílčím cílem je ověření míry, kterou jsou naplněny požadavky na aplikaci 
+(funkční i nefunkční). Tento krok potvrdí nebo vyvrátí spránvost implementace.
 
 \section{Cílová skupina}
 
@@ -169,8 +206,37 @@ indexaci produktů a jejich následné vyhledávání.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\chapter{Komentovaná rešerše informačních zdrojů}
-%...
+\chapter{Komentovaná rešerše použitých informačních zdrojů}
+
+Při práci na této literatuře vycházím nejvíce z knihy \textbf{Počítačové zpracování přirozeného 
+jazyka} \cite{strossa} od Petra Strossy, přičemž nejužitečnější pro tuto práci je první kapitola 
+zabývající se automatizovaným indexováním textů. Knih zabývající se textovým vyhledáváním existuje
+celá řada -- čerpám však především z knih \textbf{Searching in the 21st Century} \cite{searching}
+a \textbf{Mining Text Data} \cite{mining}.
+
+Dále je třeba mít povědomí o oblasti elektronického obchodování, což je přehledně shrnuto v~knize
+\textbf{E-commerce} Petra Suchánka \cite{e-commerce}. Z této knihy je pro práci nejpřínosnější 
+její první polovina, která pojednává jak o obecných termínech, tak je důkladně vysvětluje.
+
+Při návrhu API je třeba mít povědomí o tom jak jej navrhnout i jak jej v konkrétním programovacím 
+jazyce implementovat. Obecně o návrhu API pojednává kniha \textbf{Build APIs You Won't Hate} \cite{api},
+která je průvodcem návrhu dobře použitelného api od samého počátku, včetně ukázky na konkrétních příkladech.
+Pro seznámení s jazykem Go na komplexní úrovni je dostatek informací v knize \textbf{Go in Action} 
+\cite{go-in-action}, která je další z řady knih nakladatelství Manning Publications pojednávající
+o řadě dalších nástrojích. Vzhledem k specifickému užití jazyka jsem čerpám z dalších dvou knih
+o tomto programovacím jazyce -- \textbf{Mastering Concurrency in Go} \cite{go-concurrency} a 
+\textbf{Build web applications with Golang} \cite{go-xml}. Co se samotného nasazování aplikace týče, 
+velmi přínosná je kniha \textbf{The DevOps 2.0 Toolkit} \cite{devops}, která by se dala chápad jako průvodce 
+světem DevOps. Přináší spoustu informací pro pochopení tohoto přístupu, což je doloženo řadou 
+příkladů. Specielně pro důkladnější porozumění nástroji Docker je k dispozici kniha 
+\textbf{Docker: Up \& Running} \cite{docker}, která s tímto nástrojem čtenáře seznámí víc než důkladně.
+
+Vzhledem k použití nástroje Elasticsearch je třeba mít dostatek informací také o tomto nástroji.
+Jedna z nejpodrobnějších knih je \textbf{Elasticsearch: The Definitive Guide}, která
+popisuje veškerou funkčnost tohoto nástroje a popis doplňuje o teoretické informace nutné
+k pochopení dané problematiky. Elasticsearch se však velmi rychle vyvíjí a tak tato kniha
+nereflektuje přesně aktuální stav. Konkrétní funkčnost je tedy třeba vždy ověřovat vůči
+aktuální dokumentaci \textbf{Elasticsearch Reference} \cite{elastic-reference}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -218,7 +284,7 @@ k naplněnému košíku, porovnávání zboží napříč obchody).
 \begin{figure}[h]
 \center
 \includegraphics[width=\textwidth]{e-commerce.pdf}
-\caption{Vztah elektronického podnikání, obchodování a podnikání}
+\caption[Vztah elektronického podnikání, obchodování a podnikání]{Vztah elektronického podnikání, obchodování a podnikání (Zdroj: \cite{strossa})}
 \label{e-commerce}
 \end{figure}
 
@@ -257,17 +323,37 @@ nalezení kategorie, která se nachází v dlouhém a nepřehledném menu.
 \begin{figure}[h]
 \center
 \includegraphics[width=\textwidth]{atoto-vyhledavani.png}
-\caption{Ukázka plnotextového vyhledávání v elektronickém obchodu}
+\caption[Ukázka plnotextového vyhledávání]{Ukázka plnotextového vyhledávání v elektronickém obchodu atoto.cz}
 \label{atoto-vyhledavani}
 \end{figure}
 
 Implementace plnotextového vyhledávání však není triviální záležitostí. Vstup uživatele
 je v přirozeném jazyce, takže je třeba jej odpovídajícím způsobem zpracovat, 
 aby bylo vůbec vyhledávání na webu použitelné. Studium této problematiky
-může být zdlouhavé a v konečném důsledku drahé. Pokud bude k dispozici hotové řešení, 
-které bude snadno nasaditelné na elektronický obchod a bude umožňovat jednoduché 
-uzpůsobení potřebám konkrétního webu, bude to výrazná úspora jak času, tak peněz
-provozovatele obchodu.
+může být zdlouhavé a v konečném důsledku drahé. Je třeba brát v potaz
+i případnou složitost dalších nástrojů, které bude třeba pro funkční vyhledávání spravovat, 
+to s sebou nese více prostoru k potenciálním chybám.
+
+Pokud bude k dispozici hotové řešení, které bude snadno nasaditelné na elektronický obchod 
+a bude umožňovat jednoduché uzpůsobení potřebám konkrétního webu, bude to výrazná úspora jak 
+času, tak peněz provozovatele obchodu.
+
+Veškeré výše jmenované problémy mohou být značnou bariérou pro implementaci kvalitního vyhledávání, 
+přes kterou se tak množství zejména menších obchodů nepřenese. Problémy lze shrnout do následujících bodů:
+
+\begin{itemize}
+\item Provozovatel elektronického obchodu chce nasadit textové vyhledávání na web, to se musí naprogramovat
+\item Aktuální podova textového vyhledávání na webu je nekvalitní
+\item Vyhledávání na webu je pomalé, s přibývajícími produkty stáůe hůře použitelné
+\end{itemize}
+
+Řešení vyhledávání svépomocí je navíc z teoretického hlediska obtížné z~těchto důvodů:
+
+\begin{itemize}
+\item Je nutná znalost principů přirozeného jazyka
+\item Je nutná znalost nástrojů, které umožňují pokročilou práci s jazykem
+\item Je nutná znalost technologií, které poskytnou vyhledávání dostatečně rychlé
+\end{itemize}
 
 \section{Specifika elektronického obchodování}
 
@@ -377,7 +463,7 @@ se nemusí učit nic nového, pouze využijí stávající databázi. Vyhledáv�
 v nejjednodušší formě pomocí operátoru \verb|LIKE|. Některé databázové systémy
 mají disponují pokročilejšími funkcemi, kterými lze vyhledávání zlepšit \cite{postgres}.
 
-\subsection{Elasticsearch, Solr, Sphinx}
+\subsection{Elasticsearch, Apache Solr, Sphinx Search}
 
 Využitím nástrojů přímo určených pro implementaci plnotextového vyhledávání lze 
 dosáhnout nejlepších výsledků, ať už se jedná o Elasticseacrch či Apache Solr využívající
@@ -432,15 +518,22 @@ vloženy jako samostatná stránka, na které je vidět logo společnosti Google
 Základní varianta je však zdarma, je to tedy levná cesta, jak rychle zprovoznit
 vyhledávání na webu. Pokročilejší varianta umožňující konfiguraci stojí 100 USD ročně.
 
-%\subsection{Porovnání, odůvodnění vytváření nového nástroje}
-%
-%\begin{figure}[h]
-%\center
-%\includegraphics[width=\textwidth]{todo.pdf}
-%\caption{Tabulka s porovnáním nástrojů pro vyhledávání}
-%\end{figure}
-%
-% TODO: okomentování tabulky, vysvětlení, proč se vytváří nový nástroj
+\section{Odůvodnění vytváření nového nástroje}
+
+Výš uvedené nástroje sice umožňují implementaci textového vyhledávání, lze s nimi
+dosáhnout dobrých výsledků. Nicméně pokud provozovatel obchodu není ochoten investovat
+velké částky do pokročilých řešení, nastává problém. Tento problém je ještě výraznější, 
+pokud obchod nedisponuje vlastním IT oddělením a pro samotnou implementaci vyhledávání
+je vhodné využít minimum času najímaných IT specialistů.
+
+Vzhledem k zjištěným problémům při implementaci textového vyhledávání je očekávaným
+přínosem této práce, respektive vzniklé aplikace:
+
+\begin{itemize}
+\item Na webu obchodu bude dříve kvalitnější a rychlejší vyhledávání
+\item Ryhlejší implementace vyhledávání (pokud ještě na webu žádné není)
+\item Vyhledávání může být outsourcováno (úspora nákladů na IT i provoz)
+\end{itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -457,7 +550,7 @@ a dále z provedení vyhledávání uživatelem. Obecné schéma vyhledávání 
 \begin{figure}[h]
 \center
 \includegraphics[width=\textwidth]{schema-vyhledavani.pdf}
-\caption{Proces vyhledávání}
+\caption[Proces vyhledávání]{Proces vyhledávání (Zdroj: \cite{searching})}
 \label{schema-vyhledavani}
 \end{figure}
 
@@ -476,7 +569,7 @@ ze~skutečnosti, že naprostá většina elektronických obchodů své zboží n
 prostřednictvím srovnávačů zboží, přičemž v počtu návštěv a tedy celkovém provozu 
 v~rámci českého internetu jsou nejdůležitější Heureka.cz a Zboží.cz \cite{netmonitor}. 
 
-Data pro tyto srovnávače musí být dodávána prostředníctvím XML feedu, který odpovídá 
+Data pro tyto srovnávače musí být dodávána- prostředníctvím XML feedu, který odpovídá 
 specifikaci jednotlivých systémů. Při porovnání obou specifikací lze nalézt 
 jistou podobnost v požadovaných údajích. Samotný XML feed obsahuje
 produkty obchodu, přičemž u každého produktu je možné uvést několik atributů, z~nichž
@@ -489,6 +582,10 @@ cena dopravy. Informace o produktu mohou dále obsahovat popis, EAN, kód produk
 nebo soupis parametrů \cite{xml-heureka}. Minimální XML soubor s jedním produktem 
 ve formátu Heuréka by vypadal následovně:
 
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Ukázka XML souboru ve formátu Heuréka.cz}
+\label{code:xml-heureka}
 \begin{minted}{xml}
 <?xml version="1.0" encoding="UTF-8"?>
 <SHOP>
@@ -500,13 +597,13 @@ ve formátu Heuréka by vypadal následovně:
   <PRODUCTNAME>Matrace MYRBACKA</PRODUCTNAME>
   <DESCRIPTION>
    <![CDATA[Latex vám umožní lépe odpočívat a to tak, že sleduje
-    kontury vašeho těla, uvolňuje tlak a poskytuje precizní podporu.
+    kontury vašeho těla, uvolňuje tlak a poskytuje podporu.
      - Potah: 64% polyester, 36% bavlna
      - Vnitřní látka: Netkaný polypropylen, 100% jehněčí vlna
-     - Komfortní materiál: syntetický latex, polyuretanová pěna]]>
+     - Komfortní materiál: syntetický latex, pěna polyuretan]]>
   </DESCRIPTION>
-  <URL>http://ikea.com/cz/cs/catalog/products/40272131</URL>
-  <IMGURL>http://ikea.com/cz/cs/images/products/40272131.JPG</IMGURL>
+  <URL>http://ikea.com/cz/cs/catalog/products/40272</URL>
+  <IMGURL>http://ikea.com/cz/cs/images/products/40272.JPG</IMGURL>
   <PRICE>9087</PRICE>
   <PRICE_VAT>10990</PRICE_VAT>
   <CATEGORYTEXT>Dům a nábytek | Nábytek | Matrace</CATEGORYTEXT>
@@ -514,6 +611,7 @@ ve formátu Heuréka by vypadal následovně:
  </SHOPITEM>
 </SHOP>
 \end{minted}
+\end{code}
 
 Na základě znalosti struktury feedů lze zjistit, že při využití stávajících XML exportů
 internetových obchodů bude každý produkt obsahovat název, popis, URL, cenu, dostupnost
@@ -649,7 +747,7 @@ slova \verb|svíčka| by se použilo:
 
 \begin{figure}[thp]
 \centering 
-\begin{minipage}{0.7\textwidth}
+\begin{minipage}{0.73\textwidth}
 \begin{minted}{bash}
 (svíčky OR svíčce OR svíčku OR svíčko OR svíčkou 
   OR svíček OR svíčkám OR svíčkami OR svíčkách)
@@ -706,8 +804,7 @@ Zřejmou nevýhodou ve srovnání s využitím slovnku je kvalita takové lemati
 Konečně lze také pro lematizaci využít stochastických metod, respektive metod strojového
 učení. Ručně se vytvoří trénovací data, která se následně použijí pro vytvoření modelu.
 Na základě tohoto modelu lze provádět samotnou lematizaci, přičemž použitelných metod 
-strojového učení je celá řada. Každý z zde uvedených přístupů má své výhody a nevýhody, 
-nejlepších výsledků však bude možné dosáhnout jejich kombinací a vhodným nastavením.
+strojového učení je celá řada.
 
 \section{Problematika významnosti}
 
@@ -758,17 +855,16 @@ souboru indexovaných dokumentů. Přesněji jde o vztah mezi frekvencí výrazu
 a frekvencí v invertovaných dokumentech (IDF -- inverse document frequency) \cite[strana~21]{strossa}. 
 Ty lze vypočítat pomocí vzorců:
 
-\begin{figure}[h]
-\center
-\includegraphics[width=\textwidth]{tf-idf.png}
-\end{figure}
+\[tf(t,d) = 0.5 + 0.5 \cdot \frac{f_{t,d}}{max\{f_{{t}',d}:{t}'\in d\}}\]
+\vspace{1mm}
+\[idf(t,D)=log \frac{N}{\left | \{d\in D:t\in d\} \right |}\]
+\vspace{1mm}
 
 Samotná váha daného výrazu (TF-IDF) je definována jako součin těchto hodnot:
 
-\begin{figure}[h]
-\center
-\includegraphics[width=\textwidth]{tf-idf-2.png}
-\end{figure}
+\vspace{1mm}
+\[tfidf(t,d,D) = tf(t,d) \cdot idf(t,D)\]
+\vspace{0mm}
 
 Pro zpřesnění tohoto výpočtu je možné dále pracovat s váhou a to jak u frekvence výrazu, 
 tak u frekvence v invertovaném indexu. Hodnoty bývají nejčastěji normalizovány nebo
@@ -798,7 +894,7 @@ incremental search.
 \begin{figure}[h]
 \center
 \includegraphics[width=\textwidth]{google-preklep.png}
-\caption{Odhalení překlepu ve vyhledávání na webu google.com}
+\caption[Odhalení překlepu ve vyhledávání]{Odhalení překlepu ve vyhledávání na webu google.com}
 \label{google-preklep}
 \end{figure}
 
@@ -814,8 +910,7 @@ textového řetězce na druhý. Editačních vzdáleností pro textové vyhledá
 podle toho, jaké operace na textovém řetězci umožňují.
 
 V roce 1965 Vladimir Levenshtein definoval \textbf{Levenshteinovu vzdálenost} jako počet
-změn jednotlivých znaků vedoucí k transformaci z jednoho textu na druhý \cite{es-fuzziness}. 
-Konkrétně šlo o~úpravy:
+změn znaků vedoucí k transformaci z jednoho textu na druhý \cite{es-fuzziness}:
 
 \begin{itemize}
 \item Nahrazení jednoho znaku jiným: \textbf{jxblko} \textrightarrow ~\textbf{jablko}
@@ -871,13 +966,13 @@ rozděleno na trigramy, z nichž každý je dále porovnávám s trigramy indexo
 
 \begin{figure}[h]
 \center
-\includegraphics[width=\textwidth]{n-gram.png}
-\caption{Vyhledávání pomocí n-gramů}
+\includegraphics[width=\textwidth]{n-gram.pdf}
+\caption[Vyhledávání pomocí n-gramů]{Vyhledávání pomocí n-gramů (Zdroj: \cite{n-gram})}
 \label{n-gram}
 \end{figure}
 
 Tento mechanismus lze použít pro našeptávání i pro odhalení překlepů. Je snadno implementovatelný
-a poměrně rychlý, selhává však u~překlepů v krátkých slovech \cite{n-gram}. Předpokládejme slovo 
+a poměrně rychlý, selhává však u~překlepů v krátkých slovech~\cite{n-gram}. Předpokládejme slovo 
 o~délce 5 znaků -- \textbf{mobil}. Vzniklé trigramy jsou \textbf{mob}, \textbf{obi}, \textbf{bil}.
 Pokud uživatel vyhledá slovo s překlepem přesně uprostřed (\textbf{movil}), nebude nalezena
 shoda v žádném trigramu. 
@@ -912,7 +1007,7 @@ dříve, než produkty prodávané za standardní cenu.
 \begin{figure}[h]
 \center
 \includegraphics[width=\textwidth]{relevance.png}
-\caption{Řazení výsledků -- upřednostnění akčního zboží}
+\caption[Řazení výsledků]{Řazení výsledků -- upřednostnění akčního zboží na webu rohlik.cz}
 \label{relevance}
 \end{figure}
 
@@ -938,78 +1033,1271 @@ výpočetně náročnějších algoritmů.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Návrh řešení}
+\chapter{Návrh řešení vyhledávání}
 
 V této kapitole vytvářím návrh aplikace umožňující implementaci plnotextového vyhledávání
-do elektronického obchodu, které bude možné provozovat jako službu. 
+do elektronického obchodu, které bude možné provozovat jako službu. Popisuji zpsob, 
+jakým bude aplikace používána, aktéry, kteří v užívání aplikace vystupují a vytvářím
+její model, který bude požadavkům nejlépe odpovídat.
 
 \section{Definice případů užití}
-- Uzivatel zada XML\\
-- Uzivatel vyhleda\\
-- ...
+
+Aplikaci používají dva typy uživatelů. Správce (provozovatel elektronického obchodu), který
+zajišťuje její konfiguraci (například napojení vstupních dat) a zákazník elektronického
+obchodu, který provádí samotné vyhledávání. Z toho vyplývá, že ty části aplikace, které používá 
+správce musí být zabezpečeny, aby k nim neměl přístup nikdo jiný. Navíc musí aplikace umět
+pracovat s více správci zároveň, kdy má každý přístup pouze ke svým datům. Pro zákazníka
+musí být naopak jeho část aplikace veřejně přístupná, musí být také co nejrychlejší. 
+Právě zákazník bude provádět vyhledávání a rychlost, s kterou obdrží výsledky je proto
+klíčová.
+
+\begin{figure}[h]
+\center
+\includegraphics[width=\textwidth]{use-case.pdf}
+\caption{Případy užití aplikace}
+\label{use-case}
+\end{figure}
+
+Toto jsou základní případy užití z nejméně podrobného pohledu. Jednotlivé případy užití 
+popisuji podrobně níže.
+
+\subsection{Registrace do aplikace}
+
+Toto je první případ užití a jeho splnění je předpokladem pro další případy užití. Budoucí
+správce, který chce aplikaci používat musí mít vytvořen účet, který je přístupný po zadání
+jeho přihlašovacích údajů.
+
+\begin{itemize}
+\item Správce zobrazí registrační formulář
+\item Správce zadá údaje pro svůj ůčet (e-mailová adresa a heslo)
+\item Správce zadá adresu souboru XML s produkty a odešle formulář
+\item Správce je přihlášen pod novým účtem, je spuštěn import produktů
+\end{itemize}
+
+Výsledkem tohoto případu je vytvořený nový účet. Při ukládání systém kontroluje unikátnost
+zadaného uživatele a na základě zadané URL produktového XML vytváří novou konfiguraci
+daného uživatele a na pozadí spouští import produktů.
+
+\subsection{Napojení XML souboru s produkty}
+
+Tento případ užití lze jednak provést samostatně ve chvíli, kdy je správce přihlášený
+do aplikace, je ale také dílčí operací již při registraci.
+
+\begin{itemize}
+\item Správce zobrazí formulář pro zadání URL produktového XML
+\item Správce zadá adresu souboru XML s produkty a odešle formulář
+\item Je spuštěn import produktů na pozadí, je zobrazena informace správci
+\end{itemize}
+
+Po provedení tohoto případu užití je aktualizována (nebo vytvořena pokud neexistuje) 
+konfigurace daného uživatele. Zároveň je na pozadí spuštěn import produktů, aby byla
+zajištěna aktuálnost produktové databáze.
+
+\subsection{Napojení vyhledávání na elektronický obchod}
+
+Ve chvíli, kdy má správce v~aplikaci uložené produkty, může již využít samotné vyhledávání,
+které je poskytované jako služba. Toto napojení musí být maximálně intuitivní.
+
+\begin{itemize}
+\item Správce se přihlásí do aplikace
+\item Správce přejde na stránku zobrazující manuál k implementaci napojení
+\item Správce upraví elektronický obchod tak, aby byly požadavky na vyhledávání \\
+směrovány na URL uvedenou v manuálu
+\end{itemize}
+
+\subsection{Vyhledávání produktů}
+
+Nejčastějším případem užití je vyhledávání prováděné zákazníkem. To je možné až ve chvíli, 
+kdy je implementovaný jak import produktů, tak samotné vyhledávání. 
+
+\begin{itemize}
+\item Uživatel v elektronickém obchodu začne psát dotaz do textového pole pro vyhledávání
+\item Při každém napsaném nebo smazaném písmenu je odeslán HTTP požadavek na API vyhledávání
+\item Pro každá odeslaný požadavek je aktualizován výpis nalezených produktů a tento požadavek \\
+je na serveru zaznamenán
+\end{itemize}
+
+Vzhledem k důležitosti tohoto případu je nutné aby bylo vyhledávání rychlé a stabilní.
+Každé zpoždění nebo výpadek totiž snižuje důvěru klienta používající vyhledávání.
 
 \section{Návrh architektury aplikace}
-- Frontend vs backend (API)...
+
+S aplikací bude komunikovat správce prostřednictvím grafického webového rozhraní a dále
+zákazník, který s aplikací komunikuje prostřednictvím grafického rozhraní elektronického 
+obchodu. Ten musí s vyvíjenou aplikací komunikovat prostřednictvím jasně definovaného
+a jednoduše implementovatelného API.
+
+Z tohoto důvodu se jeví jako výhodné rozdělit aplikaci na dvě části -- první část (\textbf{backend}) 
+bude obstarávat veškerou logiku, perzistenci dat a bude s ní možné komunikovat prostřednictvím API. 
+Druhou částí (\textbf{frontend}) by byla samostatná webová aplikace s grafickým rohraním, která 
+sama o sobě nepracuje s žádným úložištěm, ale všechny tyto požadavky nechává vyřídit backend \cite{backend}. 
+Rozdělení na frontend a backend s sebou nese řadu dalších výhod -- frontend bůže být vyvíjen
+v jazyce, který je pro to vhodnější, na obou částech můžou v budoucnu pracovat specializovaní
+vývojáři, obě aplikace je možné nezávisle škálovat. Zpřístupněním celého API navíc mohou
+vývojáři implementovat celé napojení plně automatizovaně.
+
+Dále je třeba, aby byla architektura navržena tak, aby bylo možné aplikaci snadno škálovat. 
+To se týká databáze i samotné aplikace dostupné prostřednictvím API. Databázi je tedy
+vhodné volit takovou, která umožní také horizontální škálování \cite{scaling}. Dá se předpokládat, 
+že s~rostoucím počtem uživatelů služby bude rovnoměrně růst i potřeba na objem zpracovávaných
+dat. S horizontálním škálováním souvisí také možnost vytváření replik dat v úložišti, 
+v takovém případě by byl cluster schopný se vyrovnat s případnou ztrátou některých dat.
+S možností snadného vertikálního škálování aplikace je třeba počítat při jejím nasazování.
+Prostředí, do kterého bude aplikace nasazována by mělo být schopné aplikaci škálovat
+obdobně jako databáze. Díky tomu, že veškerá data jsou persistována v databázi, je možné
+průběžně zapínat a vypínat jednotlivé instance aplikace bez obavy o ztrátu dat.
+
+Na následujícím obrázku je znázorněn vztah mezi jednotlivými komponentami aplikace včetně
+napojovaného elektronického obchodu. Dále jsou zobrazeni oba aktéři.
+
+\begin{figure}[h]
+\center
+\includegraphics[width=\textwidth]{architektura.pdf}
+\caption[Architektura aplikace]{Architektura aplikace -- propojení dílčích komponent}
+\label{architektura}
+\end{figure}
+
+Ze schématu je zřejmé, že zákazník si zobrazuje elektronický obchod, který je zobrazen
+na základě dat z serveru obchodu. Data pro vyhledávání jsou načtena prostředníctvím API 
+aplikce, přičemž požadavek může být odeslán přímo z webového prohléžeče zákazníka 
+(asynchronní HTTP požadavek) nebo prostředníctvím serveru obchodu (pokud probíhá vykreslení 
+HTML stránky na serveru). Z druhé strany s aplikací operuje správce, který ji ovládá skrze
+administraci, která disponuje grafickým webovým rozhraním. Ta však veškeré požadavky
+směřuje na backend. Konečně backend používá pro persistenci dat (produktů i konfigurací)
+databázi, ostatním službám je pak dostupný skrze API.
+
+\section{Datový model}
+
+Nyní definuji entity, které v aplikaci vystupují, jejich atributy a vztahy mezi nimi.
+V systému je primárně definován \textbf{uživatel} (správce), který se do aplikace registroval 
+a vytváří konfiguraci pro import produktů. Pro každou tuto konfiguraci jsou do systému
+importovány produkty, jejichž struktura byla rozebrána v analýze dat, v kterých bude 
+vyhledáváno. 
+
+U uživatele je zvolen jako jeho přirozený jednoznačný identifikátor jeho e-mailová
+adresa, kterou zadává při registraci. Dále je třeba uložit jeho heslo (respektive
+jeho hash) pro umožnění přihlášení. Posledním atributem uživatele je náhodně vygenerovaný
+token, který bude využit při přístupu k API klientem. Je totiž třeba zajistit, 
+aby nebylo možné triviálním způsobem procházet produkty dalších uživatelů 
+\cite[strana~16]{api}.
+
+Uživatel si dále vytváří konfiguraci, ve které je uložena adresa s XML souborem 
+obsahujícím produkty, informace o jeho formátu (v případě že bude podporováno více
+formátů, je to vhodné pro detekci formátu a použití vhodného parseru). Tato 
+\textbf{konfigurace} náleží právě jednomu uživateli, v jiných případech nemá 
+její existence význam.
+
+Další entitou, s kterou je třeba pracovat je \textbf{produkt}. Právě ten bude vyhledáván.
+Jeho atributy v nejjednodušší podobě jsou jeho jednoznačný identifikátor nebo kód
+(v rámci daného obchodu), název, popis, URL, adresa obrázku a cena. Produkt je možné
+rozšířit o další atributy, nicméně toto jsou atributy, které by měly být u každého
+produktu známy.
+
+\begin{figure}[h]
+\center
+\includegraphics[width=\textwidth]{era-diagram.pdf}
+\caption[Datový model aplikace]{Datový model aplikace (ERA diagram)}
+\label{datovy-model}
+\end{figure}
+
+Poslední entitou znázorněnou v diagramu je zalogovaný požadavek. Vzhledem k tomu, 
+že chceme mít jednak kontrolu nad rychlostí vyhledávání, tak je dobré mít
+přehled o využití aplikace ať už jako celku, tak vzhledem k jejímu využití jednotlivými
+obchody. Každý takový záznam musí obsahovat datuma  čas, kdy byl zaznamenán, 
+URL, na kterou byl požadavek odeslán a čas, který trvalo jeho vyřízení.
 
 \section{Návrh API}
-- Frontend vs backend (API)...
 
-% ...
+Klíčový je návrh API, jehož prostřednictvím je dostupná veškerá logika aplikace. 
+Při jeho návrhu jsem se rozhodl využít přístupu design-first \cite{apiary-design}, 
+kdy je nejprve navrženo samotné API (vytvořena jeho dokumentace) a až poté je přistoupeno 
+k~samotné implementaci. Pro jeho návrh použiji nástroj Apiary \cite{apiary}, který umožňuje 
+pracovat s~API pomocí tohoto přístupu.
+
+Před konkrétním návrhem je třeba rozmyslet protokol a další principy, kterých API využívá.
+Přestože by se mohlo zdát, že to je až záležitost samotné implementace, tento krok zásadně
+ovlivňuje již způsob návrhu API. Dále je to důležité k použití přístupu design-first.
+
+Pro naplňení požadavků vycházejících z informací o problematice elektronického obchodování
+je třeba volit takový protokol, který je běžně dostupný napříč všemi běžnými webovými
+prohlížeši a je možné jej využít v používaných webových technologiích. Takovým protokolem
+je HTTP (případně novější verze HTTP/2). V Nejnvějších prohlížečích by sice bylo možné
+používat pokročilejší protokoly (například WebSockets \cite{websockets}), aktuálním cílem
+je však maximální možná kompatibilita a snadnost implementace. Samotná komunikace probíhá
+dle principu REST, data jsou zasílána ve formátu JSON, což jsou nejpřímočařejší způsoby
+návrhu a implementace \cite{api}. Bylo by možné využít jiných mechanismů (XML-RPC nebo SOAP), 
+nicméně pro tento konkrétní případ jsou méně vhodné vzhledem k jejich snadnosti implementace, 
+pochopitelnosti a rychlosti \cite[strana~31]{api}.
+
+\subsection{Datové struktury}
+
+Nejprve je třeba identifikovat zdroje (resources), což jsou datové struktury, které
+budou prostřednictvím API předávány. Dále je třeba definovat operace, které lze nad 
+jednotlivými zdroji provádět (čtení, vytváření, mazání, aktualizace) a nakonec také 
+vhodně navrhnout koncové body (endpoints) \cite[strana~12]{api}, pod kterými bude každá 
+operace dostupná.
+
+Základní zdroje, s kterými API operuje jsou \textbf{produkt} a \textbf{konfigurace uživatele}. 
+Tyto struktury nesou důležitou informační hodnotu, první veškeré informace o produktu, 
+které může být třeba v elektronickém obchodu zobrazit, druhá pak informace o nastavení 
+daného uživatele. Tyto struktury lze popsat pomocí syntaxe API Blueprint \cite[strana~131]{api}
+následovně:
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Dokumentace API -- struktura produktu}
+\label{code:api-product}
+\begin{minted}{md}
+# Data Structures
+
+## Product (object)
+- id: `1mWa9` (string, required) - ID of product
+- userId: `01dsdmmwv2dwkdlam8di8` (string, required) - User ID
+- name: `Postel bílá` (string, required) - Name of product
+- description: `Postel vyrobena z masivu...` (string, required) - Product description
+- url: `http://shop.tld/1mWa9` (string, required) - detail URL
+- img: `http://shop.tld/1mWa9.jpg` (string, required) - image URL
+- price: `1` (number, required) - Current price of product incl. VAT
+- updated: `2016-12-04T23:22:16+01:00` (string, optional) - Timestamp of last update
+\end{minted}
+\end{code}
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Dokumentace API -- struktura nastavení uživatele}
+\label{code:api-user}
+\begin{minted}{md}
+## UserConfig (object)
+- id: `01dsdmmwv2dwkdlam8di8` (string, required) - User ID
+- token: `7Tnl6xPQhVPiv80ryboo4iTckqXVuG4xjWFXTC1mzU3EaGY5` (string, required) - security token for API access
+- email: `user@email.com` (string, required) - e-mail address
+- password: `p4ssw0rd` (string, optional) - new password
+- feedUrl: `http://shop.tld/feed.xml` (string, required) - XML feed
+- feedFormat: `heureka` (enum[string], required)
+    - `heureka`
+\end{minted}
+\end{code}
+
+Zde struktura \Verb|Product| bude používána pouze pro čtení, produkty jsou vytvářeny
+na základě importovaného XML souboru. Konfigurace uživatele je používána jak při
+registraci (vytvoření nové konfigurace), tak při aktualizaci této kanfigurace (čtení
+i změna).
+
+Dalšími pomocnými strukturami jsou data pro provedení \textbf{přihlášení} správce 
+do administrace. Ten při přihlášení zadává přihlašovací jméno a heslo, jako odpověď 
+obdrží své ID a dále token, identifikující jeho sezení a použitelný pro vykonání 
+dalších požadavků.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Dokumentace API -- struktura požadavků a odpovědí serveru}
+\label{code:api-request}
+\begin{minted}{md}
+## LoginRequest (object)
+- email: `user@email.com` (string, required) - e-mail address
+- password: `p4ssw0rd` (string, required) - password
+
+## LoginResponse (object)
+- userId: `01dsdmmwv2dwkdlam8di8` (string, required) - id of user
+- token: `JT0n0rws8rRMx8P205hmc68c9yptDW91PkuLNcHe2J2NxQdyO` (string, required) - auth token
+\end{minted}
+\end{code}
+
+Poslední struktury, které API používají, definují formát odpovědi pro operace, které
+neočekávají žádná data, pouze je modifikují (mutace). Po provedení takových operací
+API informuje o úspěšnosti jejich provedení odpovídajícím stavovým kódem. V případě 
+neúspěchu přidává srozumitelnou hlášku včetně detailního popisu o důvodu neúspěchu, 
+což usnadňuje práci vývojářum napojovaných aplikací a odstraňování chyb \cite[strana~42]{api}.
+
+%## Ok (object)
+%- status: `200` (number, required) - HTTP status code
+%- message: `User created` (string, optional) - Result message
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Dokumentace API -- struktura odpovědi v případě chyby}
+\label{code:api-error}
+\begin{minted}{md}
+## Error (object)
+- status: `400` (number, required) - HTTP status code
+- message: `Unable to create user` (string, required)
+- description: `Email already exists` (string, optional)
+\end{minted}
+\end{code}
+
+\subsection{Koncové body}
+
+Pro každou operaci je definován kocnový bod (endpoint) a metoda, pomocí které je operace
+dostupná, přičemž koncový bod je URL, pod kterou je dostupný. Ta je uváděna relativně
+vzhledem k doméně, pod kterou je aplikace provozována. Dále jsou všechny mají adresy
+prefix \verb|/api/v1|, který usnadní možné budoucí aktualizace, které nejsou zpětně kompatibilní.
+
+Koncové body jsou pojmenovány podle zdrojů, s kterými pracují, aby bylo jejich používání 
+intuitivní. Prvními jsou body pro provedení přihlášení a odhlášení, které operují
+s zdroji \textbf{LoginRequest} a \textbf{LoginResponse}, respektive \textbf{Ok} a \textbf{Error}.
+
+\begin{itemize}
+\item \verb|POST /api/v1/sign/in| -- přihlášení do administrace
+\item \verb|POST /api/v1/sign/out/{token}| -- odhlášení z administrace
+\end{itemize}
+
+Další množina bodů provádí operace se zdrojem \textbf{UserConfig}. Slouží pro registraci
+nového uživatele, aktualizaci údajů stávajícího uživatele, zobrazení registračních údajů
+a případnou deaktivaci účtu stávajícího uživatele.
+
+\begin{itemize}
+\item \verb|GET /api/v1/user/{token}| -- získání konfigurace uživatele
+\item \verb|PUT /api/v1/user/{token}| -- vytvoření nebo aktualizace konfigurace
+\item \verb|DELETE /api/v1/user/{token}| -- deaktivace uživatele
+\end{itemize}
+
+Posledním koncovým bodem je vyhledávání produktů. Tento bod je jediný veřejný a použitý
+v elektronickém obchodě. Tento bod přejímá dva paramtery, kterými jsou ID uživatele
+(obchodu) a hledaný výraz. Data jsou získávána jako pole objektů \textbf{Product}, 
+které je ještě zanořeno v dalším poli, kde je dostupné pod klíčem \verb|products|.
+To usnadní budoucí možné rozšiřování o další data (výsledky agregačních dotazů nebo 
+například stav stránkování) s zachováním zpětné kompatibility.
+
+\begin{itemize}
+\item \verb|GET /api/v1/search/{userId}/{query}| -- vyhledání produktů dle \verb|query|
+\end{itemize}
+
+Tento koncový bod musí být v administraci aplikace zadokumentován a uveden s názornými 
+příklady, jak jej napojit do elektronického obchodu na základě konkrétní použité technologie.
+
+Celé API je dokumentováno v formátu API Blueprint a je distribuováno společně s zdrojovými
+kódy aplikace, které jsou přílohou této práce. Současně je vytvořen projekt v nástroji 
+Apiary, ve kterém je dokumentace uložena a veřejně přístupná pod URL 
+\url{http://docs.apisearch.apiary.io}. Ta obsahuje i vzorová data, 
+je tedy možné využít serverů proxy, které umožňují přistupovat k API, které vrací ukázková 
+data. Je tedy možné začít nezávisle na sobě navrhovat a vyvíjet stranu, která API poskytuje
+(backend) i konzumuje (frontend). Vytvořený soubor ve formátu API Blueprint budiž smlouvou, 
+která mezi těmito aplikacemi vznikla.
+
+%\section{Indexace dokumentů}
+%
+%... TODO ... teoreticky to rozebrat
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Implementace}
-- Vyber technologii a nastroju (jazyk, framework...), programovani...
+\chapter{Implementace vyhledávání jako služby}
+
+V této kapitole je popisována implementace na základě předchozího návrhu. Popisuji
+zde vše spojené s implementací, od výběru vhodných nástrojů přes samotnou implementaci
+a konfiguraci zvolených nástrojů až po nasazení do produkčního prostředí.
+text může sloužit jako návod pro implementaci vyhledávání poskytovatelného jako
+služba, kompletní zdrojové kódy jsou dostupné v příloze.
 
 \section{Výběr nástroje pro vyhledáváni}
-- Popis a porovnani vhodnych nastroju\\
-\hspace*{5mm}- MySQL\\
-\hspace*{5mm}- Elasticsearch\\
-\hspace*{5mm}- Sphinx\\
-\hspace*{5mm}- ...
+
+Nejprve je třeba zvolit nástroj, který bude použit pro samotné vyhledávání. To podporují 
+jak běžně používané relační databáze, tak specializované nástroje. U relačních databází
+jde spíše o rozšíření jejich funkčnosti a naopak -- specializované nástroje lze použít
+jako databáze. Zde je třeba rozhodnout, který z těchto nástrojů bude nejlépe vyhovovat
+požadavkům na vyhledávání.
+
+\subsection{PostgreSQL}
+
+PostgreSQL (nebo také Postgres) je jedna z open-source relačních databází, která podporuje
+mnoho funkcí, které jsou dobře použitelné pro implementaci kvalitního plnotextového 
+vyhledávání. Pro vyhledávání textu, který nepodléhá tvarosloví je možné využít operátorů
+\verb|~|, \verb|~*|, \verb|LIKE| a \verb|ILIKE|. Dále tato databáze umožňuje zpracování
+textu již při ukládání (indexaci) \cite{postgres-search}. Do databáze lze uložit slovníky, 
+které lze následně využít pro:
+
+\begin{itemize}
+\item Definici stop slov
+\item Mapování slov na jiná -- synonyma pomocí \verb|Ispell| a fráze pomocí tezauru
+\item Transformaci slov do jejich základní formy pomocí slovníku \verb|Ispell| a pomocí \
+pravidel stemmeru \verb|Snowball|
+\end{itemize}
+
+Dále disponuje funkcemi pro implementaci fuzzy vyhledávání, konkrétně \verb|levenshtein()|
+a \verb|metaphone()|. Mezi nevýhody patří obtížnější instalace a konfigurace. Zejména, 
+pokud bude třeba databázi škálovat.
+
+\subsection{Elasticsearch}
+
+Elasticsearch vznikl primárně jako nástroj pro textové vyhledávání, podporuje tak
+mnoho funkcí, které jsou pro textové vyhledávání použitelné. Interně používá
+Apache Lucene, rozšiřuje jej však o řadu funkčnosti a usnadňuje práci s ním
+používáním vlastního API. Dále je od počátku navržen jako distribuované úložiště, 
+škálování tedy spočívá pouze v přidávání uzlů. Elasticsearch poté sám vytváří
+repliky dat a distribuje je napříč clusterem \cite{elastic}. 
+
+Umožňuje import slovníků, nastavení řady filtrů pro indexaci (synonyma, n-gramy, stematizaci, 
+lematizaci a celou řadu dalších filtrů a analyzátorů \cite{es-analysis}). Zároveň umožňuje
+precizně nastavit výpočet relevance, nad daty lze vypočítávat agregace, vše je navíc
+velmi rychlé a rychlost se zásadně nemění s přibývajicími daty. Elasticsearch je výrazně 
+rychlejší ve srovnání s PostgreSQL -- \cite{es-postgres} a \cite{es-postgres-2}.
+
+\subsection{Apache Solr}
+
+Dalším nástrojem, který přichází v úvahu je Apache Solr \cite{solr}. Shodně jako Elasticsearch 
+využívá interně Apache Lucene. Co se funkčnosti týče, je tedy téměř srovnatelný s použitím
+Elasticsearch. Ten jej však převyšuje intuitivností instalace, snadnější možností použití 
+analytických dotazů a výkonností a stabilitou v vzhledem k škálování \cite{es-solr}. Přestože 
+aktuálně nejsou zmíněné výhody tolik důležité, vzhledem k očekávanému rozšiřování je vhodné 
+je vzít v potaz a dále tak uvažuji pouze nad Elasticsearch. Do závěrečného porovnání jej
+nezahrnuji, protože kromě výše uvedených nuancí by bylo hodnocení obdobné.
+
+\subsection{Sphinx}
+
+Posledním nástrojem, který přichází v potaz je Sphinx Search \cite{sphinx}. Ten se zaměřuje 
+především na rychlost, je napsán v C++, je také relativně nenáročný na paměť. 
+Pro potřeby vyhledávání má dostatek funkcí, neumí ale nic jiného, zaměřuje se
+pouze na textové vyhledávání.
+
+Na rozdíl od výše uvedených nástroj Sphinx není úložiště. Je nutné jej provozovat
+jako nadstavbu nad stávající databází (například MySQL nebo Oracle). Sphinx umí pouze 
+indexovat dokumenty a následně v nich vyhledávat, jejich načtení již však musí být provedeno 
+odjinud. Provoz s další databází by tedy v tomto případě znamenal zbytečné zesložitění architektury. 
+
+Jeho použití by ale bylo daleko vhodnější, pokud by již byla jiná databáze využívána a pouze 
+ji bylo třeba rozšířit o pokročilé textové vyhledávání. V takovém případě není třeba
+přecházet na jiné úložiště, pouze je rozšířena stávající funkčnost o plnohodnotné
+textové vyhledávání.
+
+\subsection{Porovnání nástrojů pro vyhledávání}
+
+V následující tabulce je zobrazeno přehledné porovnání dle parametrů které jsou klíčové pro 
+tento projekt. 
+
+\begin{table}[h!]
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\caption{Porovnání nástrojů pro vyhledávání}
+\label{search-comp}
+\centering
+\begin{tabular}{ll}  
+\toprule
+&\multicolumn{1}{c}{\textbf{Obecný popis}} \\
+\cmidrule(r){2-2}
+PostgreSQL    & Relační databáze umožňující textové vyhledávání \\
+Elasticsearch & Textové vyhledávání a škálovatelné úložiště \\
+Sphinx        & Textový vyhledávač \\
+\midrule
+\midrule
+&\multicolumn{1}{c}{\textbf{Snadnost instalace a konfigurace}} \\
+\cmidrule(r){2-2}
+PostgreSQL    & Snadná základní instalace, obtížnější pokročilá konfigurace \\
+Elasticsearch & Intuitivní instalace, zabezpečení, monitoring nutné řešit pluginy \\
+Sphinx        & Snadná instalace \\
+\midrule
+\midrule
+&\multicolumn{1}{c}{\textbf{Škálování}} \\
+\cmidrule(r){2-2}
+PostgreSQL    & Obtížné na konfiguraci \\
+Elasticsearch & Triviální, horizontální škálování je automaticky předpokládáno \\
+Sphinx        & Závislé na použité databázi \\
+\midrule
+\midrule
+&\multicolumn{1}{c}{\textbf{Výkonnost}} \\
+\cmidrule(r){2-2}
+PostgreSQL    & Ryhlé pro jednoduché dotazy, s složitostí výkonnost klesá \\
+Elasticsearch & Rychlé -- automatická paralelizace, cachování \\
+Sphinx        & Velmi rychlé a nenáročné na paměť\\
+\midrule
+\midrule
+&\multicolumn{1}{c}{\textbf{Textové vyhledávání}} \\
+\cmidrule(r){2-2}
+PostgreSQL    & Podporuje většinu běžných funkcí \\
+Elasticsearch & Propracované \\
+Sphinx        & Propracované \\
+\midrule
+\midrule
+&\multicolumn{1}{c}{\textbf{Podpora (dokumentace, literatura)}} \\
+\cmidrule(r){2-2}
+PostgreSQL    & Dostatečně dokumentováno, množství dostupné literatury \\
+Elasticsearch & podrobná dokumentace, profesionální podpora za poplatek \\
+Sphinx        & Dostatečně dokumentováno \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Na základě porovnání vychází vzhledem k požadavkům nejlépe použití Elasticsearch, 
+přestože využití ostatních zmíněných nástrojů by bylo také možné. Elasticsearch
+je vhodný zejména díky výkonnosti, která se zásadně nemění díky možnostem škálování, 
+množstvím podporovaných filtrů a analyzátorů a také množstvím dalších funkcí, 
+které by mohly být využity v budoucnu, bez nutnosti přechodu na jinou technologii.
 
 \section{Nastavení a nasazení Elasticsearch}
-- Implementace indexace\\
-- Implementace vyhledavani
 
-\section{Výběr nástroje pro backend}
-- Popis a porovnani vhodnych nastroju\\
-\hspace*{5mm}- Go\\
-\hspace*{5mm}- PHP\\
-\hspace*{5mm}- Java\\
-\hspace*{5mm}- ...
+Aplikace využívá Elasticsearch verze 5.1.2. Jedná se o aktuální verzi, která však
+může být v době čtení této práce zastaralá, protože vydávání nových verzí probíhá
+velmi často. Principy zde popsané se však nemění a s největší pravděpodobností 
+budou ukázky fungovat i v~novějších verzích Elasticsearch.
 
-\section{Backend}
-- Popis trid, rozhrani, implementacni detaily
+V rámci Elasticsearch se pracuje s pojmy, které je pro oprientaci třeba vysvětlit:
+
+\begin{itemize}
+\item \textbf{Cluster} je několik (alespoň jeden) serverů komunikujících spolu
+\item \textbf{Node} je jedna spuštěná instance Elasticsearch, odpovídá jednomu serveru
+\item \textbf{Index} je skupina dokumentů, které mají společnou charakteristiku
+\item \textbf{Type} je skupina souvisejících dokumentů v rámci indexu
+\item \textbf{Document} je jedna zaindexovaná položka
+\item \textbf{Field} je atribut dokumentu (například název produktu, kde produkt je dokument a název je atribut)
+\item \textbf{Shard} je část indexu Elasticsearch (index Apache Lucene), umožňuje data fyzicky
+v indexu rozdělit a distribuovat je napříč clusterem
+\item \textbf{Replica} je kopie shardu, záloha umístěná na jiném node
+\end{itemize}
+
+S Elasticsearch se komunikuje přes REST API, kdy je možné zasílat dokumenty ve formátu JSON.
+To umožňuje snadnou implementaci klientských knihoven nebo komunikaci s serverem
+z příkazové řádky nebo pomocí univerzálních nástrojů pro práci s API.
+
+\subsection{Vytvoření Docker obrazu}
+
+Pro lokální vývoj i produkční nasazení
+je využíván Docker, což je nástroj umožňující běh aplikací v izolovaném prostředí
+\cite{docker}. Umožnuje vytvoření identického prostředí, ať už je aplikace spouštěna 
+lokálně, při testech nebo v produkčním prostředí. Základním artefaktem je obraz (Docker
+image), který po spuštění vytvoří kontejner. Vztah obraz -- kontejner lze chápat jako 
+analogii k~vztahu program -- proces. Pro vytvoření Docker obrazu slouží soubor \verb|Dockerfile|,
+což je vpodstatě sada kroků (příkazů) vedoucí k požadované podobě obrazu.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Dockerfile pro Elasticsearch}
+\label{code:dockerfile}
+\begin{minted}{docker}
+# Základní obraz - oficiální Elasticsearch v Alpine Linux
+FROM elasticsearch:5.1.2-alpine
+
+# Instalace pluginu ICU
+RUN bin/elasticsearch-plugin install analysis-icu
+
+# Kopírování složky obsahující konfiguraci a slovníky
+ADD config config/
+\end{minted}
+\end{code}
+
+V souboru \verb|Dockerfile| je definováno z~jakého
+základního obrazu vychází a dále posloupnost kroků vedoucí k vytvoření požadovaného obrazu.
+Zde je zvolena oficiální verze Elasticsearch instalovaná v Apline Linux, což je minimalistická 
+linuxová distribuce zaměřená na bezpečnost \cite{alpine}. Vychází z knihoven \verb|musl libc| 
+a programu \verb|busybox| a přichází s principem, že Linuxová distribuce v základu
+nedisponuje téměř žádnými nástroji a je na uživateli, co si doinstaluje. To má příznivý
+vliv na velikost a rychlost. Taková distribuce je i bezpečnější -- je minimalizováno 
+množství míst, která mohou vést k~zranitelnosti systému. Tento přístup je pro vytváření
+kontejnerů žádoucí a tak je distribuce Apline Linux využívána stále častěji
+i v oficiálních obrazech \cite{alpine-lean}.
+
+Pro potřebu této práce je doinstalován plugin ICU, který je nutný pro korektní práci 
+s~českými znaky. Dále je do obrazu nakopírována složka \verb|config| obsahující konfiguraci
+Elasticsearch v souboru \verb|elasticsearch.yml| (výchozí název clusteru a porty, přes které 
+je Elasticsearch dostupný) a slovníky Hunspell \cite{hunspell}. To jsou slovníky obsahující 
+českou slovní zásobu a veškeré informace potřebné pro morfologickou analýzu. Běžně jsou používány 
+v~volně dostupných aplikacích jako jsou LibreOffice \cite{hunspell-download} nebo Mozilla Firefox. 
+Slovník je tvořen dvěma soubory, v~případě češtiny jsou to soubory \verb|cz_CZ.dic| a \verb|cz_CZ.aff|. 
+První soubor obsahuje slovní zásobu, příčemž u každého slova jsou uvedeny příznaky, 
+které definují, jakým slovem je slovo ohýbáno. V druhém slovu je popsána morfologie českého
+jazyka -- pro každý příznak je definováno, jakým způsobem jsou odvozovány další tvary
+slova \cite{hunspell-man}.
+
+Tento kód je sdílen prostřednictvím služby GitHub, která je napojena na Docker Hub. 
+Obdobným způsobem, jako je sdílen kód prostřednictvím verzovacích nástrojů (VCS --
+například GIT nebo SVN) lze i sdílet obrazy Docker. Jako vzdálené úložiště (obdoba 
+\verb|origin| pro GIT) je použito tak zvaný registr (Registry), kterým je standardně
+Docker Hub. Provázání mezi GitHub a Docker Hub je na té úrovní, že při aktualizaci 
+kódu v~repozitáři (provedení příkazu \verb|git push|) je automaticky spuštěno sestavení 
+nového obrazu v službě Docker Hub (příkaz \verb|docker build| a následně \verb|docker push|).
+Po sestavení obrazu je nahrán do registru a od té doby je připraven ke stažení a spuštění.
+Sestavený obraz je možné stáhnout prostřednictvím příkazu \verb|docker pull apisearch/elasticsearch|
+a lze jej využít jak pro lokální vývoj, tak pro produkční nasazení.
+
+\subsection{Nastavení indexace v Elasticsearch}
+
+Dále je třeba Elasticsearch nastavit pro správnou indexaci dokumentů. Jednotilá pole indexovaného
+dokumentu jsou rozdělena na slova pomocí tokenizéru, vzniklé tokeny jsou dále zpracovány filtry, 
+které provádí dílčí transformace. Ty lze řetězit a vytvořit tak analyzér, který popisuje
+celý proces.
+
+%\begin{figure}[h]
+%\center
+%\includegraphics[width=\textwidth]{es-indexace.png}
+%\caption{Indexace dokumentů v Elasticsearch}
+%\label{es-indexace}
+%\end{figure}
+
+První používaný filtr je typu \verb|length|, který má na starosti odstranění slov skládajících
+se z~jediného písmena. Následně je definován filtr pro odstranění stop slov \verb|stop|.
+Ten využívá výchozí databázi stop slov rozšířitelnou o libovolná další slova. Další filtr
+je typu \verb|unique| a stará se o odstranění duplicitních slov. Nemá totiž smysl mít v indexu
+uloženo slovo vícekrát, již nepřináší další informační hodnotu. Tyto filtry rozhodují, 
+zda bude dané slovo uloženo do invertovaného indexu. Uložit je lze do nastavení indexu
+následovně voláním HTTP požadavku metodou \verb|PUT| na koncový bod \verb|/products/_settings| 
+(předpokládán je název indexu \verb|products|) s následujícími daty:
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Nastavení filtrů pro indexaci v Elasticsearch (1/2)}
+\label{code:es-filters-1}
+\begin{minted}{json}
+{ "settings": {
+    "analysis": {
+      "filter": {
+        "min_length": {
+          "type": "length", "min": 2
+        },
+        "stopwords": {
+          "type": "stop", "ignore_case": true, 
+          "stopwords": ["že", "právě", "_czech_"]
+        },
+        "unique": {
+          "type": "unique", "only_on_same_position": "false"
+        },
+        "..."
+\end{minted}
+\end{code}
+
+Další filtry mají na starost transformaci slov -- převedení do základního tvaru, 
+úpravu velikosti písmen nebo generování n-gramů. Velká písmena n malá převádí filtr 
+\verb|lowercase|. Díky tomu lze vyhledávat nezávisle na velikosti písmen, která uživatel zadává. 
+Filtr, který převádí slova na jejich základní tvar se nazává \verb|hunspell|. Ten využívá
+k převodu slovník huspell, který je již nainstalován do používané distribuce Elasticsearch.
+Zvláštním filtrem je \verb|shingle|, který v podstatě vytváří n-gramy, činí tak ale na úrovni 
+celých slov. Nastavení těchto filtrů lze provést následovně:
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Nastavení filtrů pro indexaci v Elasticsearch (2/2)}
+\label{code:es-filters-2}
+\begin{minted}{json}
+{       "...",
+        "lowercase": {
+          "type": "lowercase", "min": 4
+        },
+        "shingle": {
+          "type": "shingle", "max_shingle_size": 3
+        },
+        "hunspell": {
+          "type": "hunspell", "locale": "cs_CZ", "dedup": true
+        },
+        "synonym": {
+           "type": "synonym", "synonyms_path": "th_cs_CZ.dic"
+        }
+}
+\end{minted}
+\end{code}
+
+Posledním filtrem, který by bylo možné použít je zpracovávající synonyma, který se jmenuje 
+\verb|synonym|. Tomuto filtru lze předat pod parametrem \verb|synonyms_path| cestu
+k~souboru, v~němž jsou synonyma uložena. Ta mohou být ve více formátech - podporován
+je formát Solr, kde jsou všechna související synonyma na jednom řádku oddělena čárkou,
+nebo ve formátu WordNet, což musí být definováno parametrem \verb|format|.
+Je otázkou, jak synonyma získat, protože Elasticsearch sám o sobě žádným jejich
+slovníkem nedisponuje. Jistou možností je použít již existující slovník WordNet, 
+ten je však nesmírně drahý \cite{wordnet}. Nabízí se tedy možnost opět využít slovníků
+Hunspell, které je možné stáhnout z webu OpenOffice \cite{hunspell-download}.
+
+Slovník synonym je možné dále rozšiřovat na základě praktické zkušenosti a poznatků
+z proběhlých vyhledávání -- stažený slovník jistě nebude obsahovat všechna myslitelná
+synonyma. Pro tento účel by bylo možné definovat další filtr, který však bude využívat
+vlastní soubor synonym. Problém však je, že při každé změně bude třeba přeindexovat
+všechna data, což s sebou přináší zvýšenou zátěž po dobu indexace.
+
+Nyní zbývá připravit analyzéry, které lze chápat jako řadu filtrů, které jsou zřetězeny, 
+sekvenčně zpracovávají obdržený text, přičemž vstupem filtru je výstup filtru předchozího. Využít 
+lze filtrů standardních nebo vlastních (definovaných výše). Dále je možné jedno pole nechat indexovat
+prostřednictvím více analyzérů a v těchto polích vyhledávat s rozdílnou váhou. 
+
+Analyzér používaný pro vyhledávání v názvu produktu se skládá z~filtru \verb|icu_folding| 
+(který byl instalován při vytváření Docker obrazu jako plugin) a z~filtrů definovaných výše.
+Dále je v rámci nastavení analyzéru zvolit tokenizér, což je nástroj, který dělí textový
+řetězec na slova. Nastavení analyzéru vypadá následovně:
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Nastavení analyzátorů v Elasticsearch}
+\label{code:es-analyzers}
+\begin{minted}{json}
+{ "settings": {
+    "analysis": {
+      "filter": { "..." }
+      "analyzer": {
+        "icu": {
+          "filter": [
+            "icu_folding",
+            "min_length",
+            "hunspell",
+            "synonym",
+            "stopwords",
+            "unique"
+          ],
+          "tokenizer": "standard"
+        }
+      }
+} } }
+\end{minted}
+\end{code}
+
+Zbývá doplnit nastavení indexu, které nesouvisí přímo s~indexací, ale s~provozem Elasticsearch.
+Jednou z těchto konfigurací je nastavení počtu fragmentů (shards) a replik (replicas).
+Pro lokální vývoj nemá smysl jiné nastavení než počet fragmentů roven jedné a počet
+replik roven nule. Pokud není spuštěn Elasticsearch v režimu clusteru (neexistuje více uzlů), 
+není jednoduše kam repliky ukládat. Stejně tak nemá smysl vytvářet více fragmentů, které
+znamenají pouze vyšší režii souborového systému. V produkčním prostředí je však situace jiná --
+vše se však odvíjí od množství dat a dostupných serverů, případně jader procesorů.
+
+První verze aplikace je však spouštěna na jediném serveru s dvěma vlákny procesoru, je tedy
+vhodné začít s nastavením shodným s lokálním prostředím. S přibývajícími daty a servery je
+možné vytvářet index znovu s jinou konfigurací a data do nich přenést pomocí\verb| Reindex API|.
+Konfigurace indexu tedy vypadá následovně:
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Nastavení indexu Elasticsearch}
+\label{code:es-settings}
+\begin{minted}{json}
+{"settings": {"number_of_shards": 1, "number_of_replicas": 0}}
+\end{minted}
+\end{code}
+
+Nyní zbývá použít konfigurované analyzéry pro definici mapování (mapping), tedy přiřadit jednotlivým
+polím způsob, jakým jsou analyzovány. Obecně zde platí, že je vhodné každé pole ukládat podle 
+odpovídajícího datového typu případně povahy dat. Například cenu ukládat jako \verb|long| případně
+\verb|double|, datum uložení produktu jako \verb|date|, případné příznaky jako \verb|boolean|.
+Speciální přístup platí pro ukládání textových řetězců, kdy je třeba rozhodnout, zda má dané pole
+podléhat textové analýze. V některých případech je to nežádoucí (EAN, ID uživatele), v některých
+naopak velmi důležité (název produktu). Pro první případ lze využít datového typu \verb|keyword|, 
+v druhém případě typu \verb|text|. V tomto případě je třeba definovat také analyzér, který bude pro 
+dané pole použit, přičemž jich může být více.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Nastavení mapování v Elasticsearch}
+\label{code:es-mapping}
+\begin{minted}{json}
+{ "mappings": {
+  "product": {
+    "properties": { 
+      "id": {"type": "keyword"}, 
+      "name": {
+        "type": "keyword"
+        "fields": {
+          "hunspell": {"type": "text", "analyzer": "hunspell"}
+        }
+      },
+      "price": {"type": "float"},
+      "updated": {"type": "date", "format": "date_time_no_millis"}
+    }
+  }
+}}
+\end{minted}
+\end{code}
+
+Kompletní podoba konfigurace indexu je součástí projektu a je k dispozici ve zdrojových kódech 
+v~příloze této práce.
+
+\subsection{Vyhledávání v Elasticsearch}
+
+Dále je třeba připravit dotaz, pomocí kterého bude provedeno vyhledávání v Elasticsearch.
+Celý dotáz může obsahovat několik částí -- samotný dotaz (\verb|query|), stránkování 
+(\verb|from| a \verb|size|), řazení (\verb|sort|), agregace (\verb|aggs|), projekci
+(\verb|_source|). V tomto případě je třeba získat celé dokumenty bez dalších modifikací
+nebo přidaných výpočtů, jde tedy o vytvoření dotazu v sekci \verb|query|. Řazení v tuto 
+chvíli probíhá dle relevance a taktéž stránkování je řešeno až dle dotazu klienta.
+
+Celý dotaz se skládá z dílčích dotazů, které jsou následně spojeny v jeden
+Pro textové vyhledávání dle zadaného dotazu je využito \verb|multi_match_query|, 
+což umožňuje vyhledávání ve více polích s definicí priority jednotlivých polí.
+Vyhledává se v analyzované titulku s nejvyšší prioritou a v neanalyzovaném titulku (pro posunutí
+produktů přesně odpovídající zadanému dotazu v pořadí výsledků) a v popisku s prioritou nižší.
+Dále je upraven způsob vyhodnocení výsledů na \verb|most_fields|, což na rozdíl
+od výchozího chování bere v potaz výsledky vyhledávání ve všecho polích (standardně je počítáno
+pouze s nejlepším z nich). Míra tohoto efektu je nastavena parametrem \verb|tie_breaker|.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Textové vyhledávání v Elasticsearch}
+\label{code:es-search-1}
+\begin{minted}{json}
+{
+    "query": {
+        "multi_match": {
+            "query": "hledaný výraz", 
+            "fields": ["name.hunspell^3", "name", "description"],
+            "type": "most_fields",
+            "tie_breaker": 0.3
+        }
+    }
+}
+\end{minted}
+\end{code}
+
+Dále je dotazováno na název produktu s překlepy. Toho je docíleno pomocí \verb|match_query|
+s nastaveným parametrem \verb|fuzziness|. Překlepy jsou předpokládány pouze pro název produktu, 
+pro dlouhé popisky by to mělo negativní vliv na rychlost navíc s pravděpodobně rostoucí
+nepřesností. Pro míru podobnosti textových řetězců je použita Levenshteinova editační
+vzdálenost, přičemž argumentem dotazu je velikost této vzdálenosti. Tolerovatelná vzdálenost
+může růst s délkou textového řetězce, kdy roste pravděpodobnost vzniklých chyb. Jiné
+nastavení tolerované vzdálenosti vzhledem k dálce textového řetězce je nutné nastavit
+v prostředí, ve kterém je dotaz sestavován, přímo v rámci Elasticsearch to není možné.
+Konečně je také definován analyzer, kterým je hledaný výraz zpracován, aby probíhalo porovnání
+na řetězci, které prošly shodnou transformací.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Vyhledávání s překlepy v Elasticsearch}
+\label{code:es-search-2}
+\begin{minted}{json}
+{
+    "query": {
+        "match": {
+            "name.hunspell": {
+                "query": "hledXný výraz",
+                "fuzziness": 1,
+                "analyzer": "hunspell"
+            }
+        }
+    }
+}
+\end{minted}
+\end{code}
+
+Pro aktivaci funkce našeptávání (vyhledávání nedopsaných výrazů) lze využít dotazu \verb|prefix|.
+Zde je předpokládáno, že zadané slovo není uvedeno kompletní a je vyhledáváno
+dle jeho prefixu. Takový výraz může být zapsán jako \textbf{hledan}, přičemž dotaz je chápán
+jako \textbf{hledan*}, kde hvězdička značí libovolnou sekvenci znaků.
+
+Tato expanze probíhá v době vyhledávání a přestože bude ve většině případů dostačující, 
+je možné pracovat s našeptáváním již v době indexace dokumentů, což se pozitivně projeví zejména 
+v rychlosti vyhledávání \cite{es-suggester}.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Našeptávání v Elasticsearch}
+\label{code:es-search-3}
+\begin{minted}{json}
+{
+    "query": {
+        "prefix": {
+            "name.hunspell": "hledan"
+        }
+    }
+}
+\end{minted}
+\end{code}
+
+Celý dotaz je obalen do \verb|bool query|, což umožňí spojit výše uvedené dílčí dotazy pomocí
+logických spojek. Dílčí dotazy mohou být v blocích \verb|should| (což je logické OR), 
+\verb|must| (odpovídá logické spojce AND) a nebo \verb|must_not|, což odpovídá logickému NOT.
+Další možností je sekce \verb|filter|, která je funkčně shodná s \verb|must|, umožňuje však
+interně využívat kešování, což může mít pozitivní vliv na rychlost.
+
+Dotazy jsou v tomto případě vloženy do bloku \verb|should|, dále je nastaven paramter
+\verb|minimum_number_should_match| na hodnotu rovnou jedné, což znamená, že dokument odpovídá
+hledanému dotazu, pokud je nalezen pomocí alespoň jednoho dílčího dotazu.
+Pokud dokument odpovídá více dílčím dotazům, je to bráno v~potaz při skórování
+výsledků vyhledávání a takový dokument se ve výsledcích objeví výše.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Složení dotazů pro Elasticsearch}
+\label{code:es-search-4}
+\begin{minted}{json}
+{
+    "query": {
+        "bool": {
+            "should": [
+                {"multi_match": {"..."}},
+                {"match": {"..."}},
+                {"prefix": {"..."}}
+            ],
+            "name.minimum_number_should_match": 1
+        }
+    }
+}
+\end{minted}
+\end{code}
+
+Vzhledem k tomu, že v jednom indexu jsou ukládány data všech uživatelů, je třeba vyfiltrovat
+jen produkty daného uživatele. Každý produkt má definované ID uživatele, kterému náleží. 
+Zde jde o přesnou shodu, takže je vyhledáváno (nebo spíše filtrováno) pomocí klauzule
+\verb|term|, která nepracuje s analyzátory. Ta je vhodná pro použití s výrazy, které
+jsou ukládány jako ty \verb|keyword|.
+
+Tento dotaz je dále vložen do booleovského dotazu do sekce \verb|filter|. Bylo by sice 
+možné použít sekci \verb|must|, nicméně pro případ, kdy probíhá filtrace je prvně 
+jmenovaná sekce lepší. Její výsledky totiž mohou být interně ukládány do mezipaměti, 
+filtrace tak bude při opakujícím se použití rychlejší. Navíc zde není výsledek
+této filtrace započítáván do konečného skóre, což by nedávalo smysl -- zjišťuje se, 
+\textbf{zda} daný dokument odpovídá zadanému výrazu, nikoli však \textbf{do jaké míry}.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Filtrování dle ID uživatele v Elasticsearch}
+\label{code:es-filter}
+\begin{minted}{json}
+{
+    "query": {
+        "bool": {
+            "should": ["..."],
+            "filter": [
+                {
+                    "term": {
+                        "userId": "aKi2mc7mckID0hyMsk9oQ"
+                    }
+                }
+            ]
+        }
+    }
+}
+\end{minted}
+\end{code}
 
 \section{Frontend}
-- Frontend: UI, komunikace s backendem
 
-\section{Deployment}
-- Deployment, CI
+Frontend je grafickým rozhraním pro komunikaci s backendem. Sám o sobě je bezstavový, je pouze
+grafickou obálkou nad API. Implementován je v jazyce PHP a frameworku Nette, což umožňuje rychlý
+vývoj aplikace při dodržení dobrých programátorských návyků. Využívá vzoru MVC pro oddělení logiky
+a zobrazení a Dependency Injection pro předávání závislostí. Pro napojení na API využívá knihovnu 
+\verb|GuzzleHttp|, což je jediná externí závislost projektu.
 
-\section{Testování, ověření}
-- Overeni funkcnosti a prinosu\\
-- Testovani, zda jsou splnena akceptacni kriteria\\
-- Porovnani s stavajicim resenim vyhledavani na konkretnim priklade
+Po registraci do aplikace je na pozadí spuštěn import produktů. Již v průběhu import však může uživatel
+testovat funkčnost vyhledávání, aby si jej mohl ověřit ještě před samotným napojením na obchod.
+Zároveň je zobrazována rychlost odezvy, aby uživatel viděl, jak dlouho reálně každý požadavek trvá.
+
+\begin{figure}[h]
+\center
+\includegraphics[width=\textwidth]{frontend.png}
+\caption{Frontend -- kontrola funkce vyhledávání}
+\label{frontend}
+\end{figure}
+
+Dále je součástí této aplikace návod na napojení elektronického obchodu. To je popsáno jednak
+principiálně (s odkazem na dokumentaci v Apiary), tak je k dispozici příklad implementace, 
+který je možné rovnou zkopírovat do webu obchodu. Příklady jsou pro nejpoužívanější jazyky
+z prostředí webu (PHP a JavaScript), přičemž jsou navrženy tak, aby nebylo třeba instalovat
+další závislosti a napojení tak bylo co nejsnadnější.
+
+Poslední možností, kterou aplikace nabízí je úprava nastavení -- uživatel zde může změnit
+přihlašovací údaje (e-mail nebo heslo) a adresu XML souboru s produkty. Z aplikace se může 
+uživatel odhlásit, veškeré jeho nastavení je dostupné pouze po přihlášení, což je nutné
+pro možnost využívání aplikace více uživateli (elektronickými obchody).
+
+\section{Backend}
+
+Dále je třeba rozhodnout, v čem bude psán backend, pomocí jakého programovacího jazyka
+nebo frameworku. Možností je celá řada, v úvahu přichází jak využití dynamických skritovacích 
+jazyků běžně využívaných pro web (nejpoužívanější PHP nebo JavaScript), přes jazyky 
+s~komplexnějším prostředím využívající k běhu virtuální stroj (Java, .NET), až po statické 
+překládané jazyky (C, C++, GoLang). Je třeba zvolit takový jazyk, který bude rozumně použitelný, 
+bude k němu dostatek knihoven pro tvorbu API a práci s Elasticsearch, aby netrvalu samotná
+implementace neúměrně dlouho. Na druhou stranu je však třeba, aby daný jazyk umožňoval
+vytvoření serveru, který bude schopný vyřizovat požadavky co nejrychleji.
+
+Vzhledem k požadované rychlosti nepřichází v úvahu skriptované jazyky, které sice mohou
+poskytovat rozumnou dobu odezvy, pokud je ale možnost ji snížit pomocí jiného jazyku, 
+není důvod toho nevyužít. Volba padla na jazyk GoLang, což je jazyk, který vznikl 
+ve společnosti Google a měl přinést některé výhody dynamicky typovaných jazyků do jazyků 
+staticky typovaných \cite{go-in-action}. Přináší zejména stručný zápis některých konstrukcí, 
+snadný a rychlý překlad. 
+Součástí distribuce SDK je také balíčkovací manažer, nástroje pro formátování zdrojových kódů, 
+statickou analýzu nebo dokumentaci.
+GoLang disponuje knihovnami pro implementaci API, HTTP serveru i komunikace s Elasticsearch. Nebrzdí 
+také případné další rozšiřování, je možné s jeho pomocí implementovat podporu dalších protokolů jako
+WebSockets nebo gRPC. Zároveň však téměř odstraňuje nevýhody jazyků vyždující překlad.
+Samotný překlad je velmi rychlý, v řádu jednotek sekund, což je ve srovnání s ostatními
+jmenovanými jazyky výrazně rychlejší. Dálší výhodou je, že po překladu vznikne jeden
+binární soubor, který nevyžaduje žádné běhové prostředí a není závislý na jiných knihovnách, 
+což výrazně zkrátí dobu sestavení i nasazení.
+
+Pro zpracování spuštění programu z příkazové řádky je použita knihovna \verb|urfave/cli|, 
+která umožňuje definovat jednotlivé argumenty, s nimiž může být aplikace spuštěna.
+Obsahuje také sadu základních příkazů jako je zobrazení nápovědy nebo verze programu.
+V této aplikaci jsou definovány celkem při příkazy -- spuštění serveru, spuštění asynchroního
+importu produktů a vytvoření indexu v Elasticsearch.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Struktura produktu v jazyce Go}
+\label{code:go-product}
+\begin{minted}{go}
+type Product struct {
+    Id          string `xml:"ITEM_ID" json:"id"`
+    UserId      string `xml:"-" json:"userId"`
+    Name        string `xml:"PRODUCTNAME" json:"name"`
+    Description string `xml:"DESCRIPTION" json:"description"`
+    Url         string `xml:"URL" json:"url"`
+    Img         string `xml:"IMGURL" json:"img"`
+    Price       int    `xml:"PRICE_VAT" json:"price"`
+    Updated     string `xml:"-" json:"updated"`
+}
+\end{minted}
+\end{code}
+
+Vytvoření indexu je možné spuštěním přeloženého programu s argumentem \verb|createIndex|.
+Po spuštění je spuštěna funkce \verb|CreateIndex| v balíčku \verb|elastic|. 
+Ta vytvoří indexy v Elasticsearch (pokud neexistují) a následně u nich aktualizuje mapování.
+Lze tak tento příkaz použít pro přidávání nových polí i v produkčním porstředí.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Hromadná indexace produktů}
+\label{code:go-indexing}
+\begin{minted}{go}
+// Vytvoření procesoru pro hromadný import
+bulk, err := products.BulkStart()
+// Indexace každěho produktu
+for i, _ := range productList.ProductList {
+    productList.ProductList[i].UserId = s.UserId
+    productList.ProductList[i].Updated = time.Now().Format("2006-01-02T15:04:05-07:00")
+    productList.ProductList[i].BulkIndex(bulk)
+}
+// Dokončení indexace - uložení zbývajících produktů a zavření procesoru
+err = products.BulkFlush(bulk)
+\end{minted}
+\end{code}
+
+Druhým příkazem je spuštění importu produktů po spuštění programu s argumentem \verb|import|.
+To je vykonáno spuštěním funkce \verb|ImportXmlFiles| v balíčku \verb|importer|. Ta načte 
+veškeré konfigurace uživatelů a pro každou z nich spustí import produktů prostřednictvím 
+funkce \verb|ImportXmlFile|. Pro samotnou komunikaci s Elasticsearch je použita knihovna 
+\verb|olivere/elastic|. Import produktů je implementován tak, že se nejprve načte zdrojový
+XML soubor, který se namapuje na pole produktů pomocí interní prostřednictvím vestavené
+funkce \verb|Unmarshal| \cite{go-xml}. Produkt je zde struktura, která je definována 
+ve výpisu \ref{code:go-product}.
+
+Součástí definice struktury není pouze výpis jejích prvků s odpovídajícími datovými typy, 
+ale také nastavení pro převod struktury do textového řetězce ve formátu XML a JSON.
+Každý produkt který vznikl převodem z XML je následně převeden s pomocí interní funkce \verb|Marshall|
+na textový řetězec ve formátu JSON. To už je formát, ve kterém může být produkt ukládán do
+Elasticsearch. Ukládání produktů je provedeno pomocí hromadné indexace.
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Routování HTTP serveru}
+\label{code:go-routing}
+\begin{minted}{go}
+route := Route{
+    "Search",                          // Nazev
+    "GET",                             // HTTP metoda
+    "/api/v1/search/{userId}/{query}", // Vzor URL
+    v1.Search,                         // Obslužná funkce
+    []string{},                        // Validace argumentů URL
+}
+\end{minted}
+\end{code}
+
+Ta je na pozadí implementována tak, že ukládání probíhá paralelně a navíc Elasticsearch 
+provádí samotnou indexaci v dávkách. Díky tomu je import extrémně rychlý a přitom 
+není třeba se starat o spouštění dalších procesů -- to provádí knihovna s pomocí
+příkazu \verb|go| \cite{go-concurrency}.
+
+Poslední možností jak přeložený program spustit je nastartování HTTP serveru. Server
+je použit z standardní knihovny \verb|net/http|. Pro routování příchozích požadavků
+na odpovídající funkce na základě použité URL je použia knihovna \verb|gorilla/handlers|.
+Každý možný tvar požadavku je definován jako struktura:
+
+Toto je konkrétní zápis definice koncového bodu pro vyhledávání v produktech daného uživatele.
+Požadavek poté obsloužen funkcí, která má v tomto případě předpis 
+\verb|func Search(w http.ResponseWriter, r *http.Request) {}|. Může tedy číst veškeré
+parametry s nimiž byla spuštěna (\verb|*http.Request|) a také má kam zapsat
+výstup, ať už se jedná o odpověď ve formátu JSON nebo odpovídající stavové kódy 
+(\verb|http.ResponseWriter|). Uvnitře této funkce je provedeno samotné vyhledávání
+pomocí funkce \verb|products.Search|, která vrací pole produktů. Ty jsou následně transformovány
+do formátu JSON a vráceny jako odpověď serveru.
+
+\section{Nasazení aplikace do produkčního prostředí}
+
+\begin{figure}[h]
+\center
+\includegraphics[width=\textwidth]{circleci.pdf}
+\caption[Kontinuální nasazování aplikace]{Kontinuální nasazování aplikace pomocí CircleCI (Zdroj: \cite{circleci})}
+\label{circle-ci}
+\end{figure}
+
+Posledním krokem k zveřejnění aplikace a jejímu zpřístupnění veřejnosti je její nasazení 
+do produkčního prostředí. Pro vytvoření nasaditelného artifaktu je použit nástroj Docker, 
+obdobně jako při distribuci Elasticsearch. Aby nemusel vývojář po každé změně zdrojových
+kódů znovu ručně vytvářet nasazovat novou verzi aplikace (což je zdlouhavé a navíc může
+vést k chybám \cite[strana~23]{devops}), je vzdálený GIT repozitář propojen s integračním 
+serverem, který provede sestavení a nastavení aplikace automaticky. Konkrétně je používán 
+CircleCI \cite{circleci}.
+
+Pomocí CircleCI je nasazován jak frontend, tak backend. Vývojář nahraje provedené změny
+v lokálním repozitáři do repozitáře vzdáleného (GitHub), ten poté odešle požadavek do
+napojeného integračního serveru (CircleCI) s informací o repozitáři, který byl aktualizován.
+V rámci CircleCI je spuštěn nový virtuální stroj, který stáhne aktuální verzi zdrojových kódů
+z vzdáleného repozitáře a dále postupuje podle příkazů definovaných v souboru \verb|circle.yml|.
+V něm je definováno jak mají být získány závislosti aplikace (příkazem \verb|go get| v případě 
+backendu) a jak má být aplikace sestavena (\verb|go build| v případě backendu). Vytvořený binární
+soubor je poté nakopírován do prázdného Docker obrazu, který je poté spuštěn příkazem \verb|docker run|. 
+Tím je ověřeno, že byl obraz sestaven v pořádku a je nahrán do registru příkazem \verb|docker push|.
+Nakonec je spuštěno samotné nasazení, které je provedeno pomocí nástroje \verb|docker-compose|
+na vzdáleném serveru.
+
+Všechny kontejnery jsou spravovány prostřednictvím nástroje Docker Compose \cite{compose}.
+Ten usnadňuje práci s Docker démonem -- používá vlastní sadu příkazů a veškerá konfigurace
+se provádí pomocí YAML souboru. Díky tomu, že jde o deklarativní přístup, je možné
+příkazy opakovat a vždy je dosaženo stejného očekávaného výsledku. Tento konfigurační 
+soubor je pojmenován \verb|docker-compose.yml| a má pro tuto aplikaci následující podobu:
+
+\begin{code}
+\captionsetup{singlelinecheck=false,justification=raggedright}
+\captionof{listing}{Konfigurace pro Docker Compose}
+\label{code:docker-compose}
+\begin{minted}{yaml}
+web-admin:
+  image: apisearch/web-admin
+  ports:
+   - "7010:8080"
+  links:
+   - apisearch
+  restart: always
+apisearch:
+  image: apisearch/apisearch
+  command: server
+  ports:
+   - "7011:8080"
+  links:
+   - elasticsearch
+  restart: always
+elasticsearch:
+  image: apisearch/elasticsearch
+  volumes:
+   - /mnt/apisearch/elasticsearch:/usr/share/elasticsearch/data
+  restart: always
+\end{minted}
+\end{code}
+
+Tento soubor definuje takzvaný stack, což je skupina několika souvisejících služeb. V tomto
+případě jsou definovány tři služby (\verb|web-admin| -- frontend, \verb|apisearch| -- backend 
+a \verb|elasticsearch|). U všech služeb je nastaveno, aby se v případě chyby automaticky restartovaly.
+Dále je u prvních dvou služeb definován port, přes který jsou dostupné. Na serveru je pak 
+nastavena proxy, která na základě celé URL směruje příchozi požadavky na jednu z těchto služeb.
+U služby \verb|elasticsearch| je v \verb|volumes| definována složka, do které jsou persistována
+data. Po restratu kontejneru totiž dochází ke ztrátě jeho dat, což by byl problém vzhledem
+k stavovosti služby. Je tedy zvolena složka v hostitelském stroji, která je použita pro persistenci
+těchto dat. Celou skupinu služeb je možné spustit jediným příkazem \verb|docker-compose up -d|.
+Zároveň je možné pomocí tohoto nástroje sledovat logy všech běžících služeb, jejich stav
+a případně je aktualizovat nebo zastavovat.
+
+Použití tohoto nástroje má výhodu v tom, že vzhledem k tomu, že jej oficiálně vydává Docker, 
+v dobré podpoře a kompatibilitě s ostatními nástroji. V případě nutnosti horizontálního škálování
+lze využít některý z orchestrátorů \cite[strana~300]{devops} (například Docker Swarm, Docker Cloud 
+nebo Rancher), které jsou s tímto formátem zápisu kompatibilní. 
+
+\chapter{Testování, ověření funkčnosti}
+
+Tyhle body dopsat i do analyzy jako pozadavky v tabulce..
+
+\section{Funkční požadavky}
+    - Otestovat, ze to umi to co ma (fulltext case insensitive, preklepy, naseptavani, sklonovani, synonyma...)\\
+	- tohle kdyztak dodat aby bylo presne do pozadavku\\
+	- udelat cli nastroj co udela request a vypise na cli nazev produktu odpovidajicich\\
+	- udelat testovaci mnozinu dat (pro testy vyse) a popsat ji\\
+	- -> vypisy CLI nebo screeny GUI z testu vyhledavani\\
+
+\section{Rychlost služby}
+	- nasypat >100k produktu a prohnat asi nastrojem ab, otestovat dobu response\\
+	- -> vypisy, grafy...\\
+
+\section{Snadnost napojení na službu}
+	- popsat implementaci na velingu, kroky co je potreba udelat, pripadne odhad doby implementace
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Závěr}
+
 V této diplomové práci jsem...
 
 \section{Dosažení vytčených dílů}
+
 ...
 
 \section{Diskuze možného budoucího rozšiřování}
+
 ...
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+\chapter{Terminologický slovník}
+
+\begin{center}
+
+\begin{tabular}{L{50mm} L{17mm} L{73mm}} 
+\toprule
+\textbf{Termín} & \textbf{Zkratka} & \textbf{Význam} \\
+\midrule
+Uniform Resource Locator & URL & Adresa dokumentu na webu\\
+\hline
+Extensible Markup Language & XML & Značkovací jazyk\\
+\hline
+European Article Number & EAN & Mezinárodní číselná identifikace výrobků\\
+\hline
+International Standard Book Number & ISBN & Číselná identifikace knižních vydání\\
+\hline
+Structured Query Language & SQL & Jazyk určený pro dotazování v relačních databázích\\
+\hline
+Hypertext Transfer Protocol & HTTP & Protokol pro přenos souborů po síti internet\\
+\hline
+Application Programming Interface & API & Rozhraní pro programování aplikací\\
+\hline
+Representational State Transfer & REST & Architektura rozhraní pro komunikaci mezi počítačovými systémy\\
+\hline
+Simple Object Access Protocol & SOAP & Protokol pro výměnu zpráv přes síť\\
+\hline
+Formální jazyk & & Množina konečných slov nad určitou abecedou\\
+\hline
+Počítačová lingvistika & & Obor na pomezí lingvistiky a informatiky -- věda o porozumění přirozenému jazyku\\
+\hline
+Morfologie & & Lingvistická disciplína zabývající se ohýbáním slov\\
+\hline
+Frontend & & Část aplikace s kterou uživatel přímo komunikuje prostřednictvím grafického rozhraní\\
+\hline
+Backend & & Část aplikace, která obstarává její logiku a persistenci dat\\
+\bottomrule
+\end{tabular}
+
+\end{center}
+
+
+\chapter{Obsah přiloženého CD}
+
+
+\begin{center}
+
+\begin{tabular}{L{67mm} L{73mm}} 
+\toprule
+\textbf{Soubor/složka} & \textbf{Popis} \\
+\midrule
+\verb|DP_Ludek_Vesely.pdf| & Text diplomové práce\\
+\hline
+\verb|DP_Ludek_Vesely-screencast.pdf| & Ukázka použití aplikace koncovým uživatelem\\
+\hline
+\verb|src/backend| & Zdrojové kódy -- backend\\
+\hline
+\verb|src/frontend| & Zdrojové kódy -- frontend\\
+\hline
+\verb|src/elasticsearch| & Použitá distribuce Elasticsearch včetně konfiguračních souborů, slovníků a pluginů\\
+\hline
+\verb|src/docker-stack| & Konfigurace pro Docker Compose\\
+\bottomrule
+\end{tabular}
+
+\end{center}
+
+
+%\chapter{Graf jako příloha}
+%\begin{figure}[h]
+%\center
+%\includegraphics[width=0.86\textwidth]{todo.pdf}
+%\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{Mm99}
 
+% e-commerce
+
 \bibitem{e-commerce} SUCHÁNEK Petr. \emph{E-commerce}.
 Vyd.~1. Praha: Ekopress, s.r.o., 2012 144~s. ISBN 978-80-86929-84-2.
+
+% vyhledávání
 
 \bibitem{strossa} STROSSA, Petr. \emph{Počítačové zpracování přirozeného jazyka}.
 Vyd.~1. Praha: Oeconomica, 2011 316~s. ISBN 978-80-245-1777-3.
@@ -1021,11 +2309,7 @@ Vyd.~1. Library of Congress Cataloging-in-Publication Data, 2009 295~s. ISBN: 97
 \bibitem{mining} AGGARWAL Charu C., ZHAI ChengXiang. \emph{Mining Text Data}.
 Springer New York Dordrecht Heidelberg London, 2000 522~s. ISBN 978-1-4614-3222-7.
 
-\bibitem{api} STURGEON Phil. \emph{Build APIs You Won't Hate}.
-Vyd.~1. Philip J. Sturgeon, 2015 188~s. ISBN 978-0692232699.
-
-\bibitem{go-in-action} KENNEDY William. \emph{Go in Action}.
-Manning Publications Co, 2016 264~s. ISBN 978-1-6172-9178-4.
+% elastic
 
 \bibitem{es-guide} CLINTON Gormley, ZACHARY Tong. \emph{Elasticsearch: The Definitive Guide}.
 O'Reilly Media, 2015 724~s. ISBN 978-1-4493-5854-9.
@@ -1033,6 +2317,38 @@ O'Reilly Media, 2015 724~s. ISBN 978-1-4493-5854-9.
 \bibitem{elastic-reference} Elasticsearch. \emph{Elasticsearch Reference} [online].
 2017 [cit. 2017-03-03]. Dostupné z:
 \url{https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html}
+
+% api
+
+\bibitem{api} STURGEON Phil. \emph{Build APIs You Won't Hate}.
+Vyd.~1. Philip J. Sturgeon, 2015 188~s. ISBN 978-0692232699.
+
+% go
+
+\bibitem{go-in-action} KENNEDY William. \emph{Go in Action}.
+Manning Publications Co, 2016 264~s. ISBN 978-1-6172-9178-4.
+
+\bibitem{go-concurrency} KOZYRA Nathan. \emph{Mastering Concurrency in Go}.
+Packt Publishing, 2014 301~s. ISBN-13 978-1783983483.
+
+\bibitem{go-xml} ASTAXIE. \emph{Build web applications with Golang} [online].
+2017 [cit. 2017-04-14]. Dostupné z: \url{https://astaxie.gitbooks.io/build-web-application-with-golang/en/07.1.html}.
+
+% docker
+
+\bibitem{docker} MATTHIAS Karl, KANE P. Sean. \emph{Docker: Up \& Running}.
+O'Reilly Media, 2015 232~s. ISBN 978-1-4919-1754-1.
+
+\bibitem{devops} FARCIC Viktor. \emph{The DevOps 2.0 Toolkit: Automating the Continuous Deployment Pipeline 
+with Containerized Microservices}. Packt Publishing, 2016 462~s. ISBN:978-1-78528-031-3.
+
+% další...
+
+\bibitem{apiary} Apiary. \emph{Platform for API Design, Development \& Documentation} [online].
+2017 [cit. 2017-03-11]. Dostupné z: \url{https://apiary.io}.
+
+\bibitem{elastic} Elastic. \emph{ Elasticsearch: RESTful, Distributed Search \& Analytics} [online].
+2017 [cit. 2017-04-12]. Dostupné z: \url{https://www.elastic.co/products/elasticsearch}
 
 \bibitem{algolia} Algolia. \emph{Hosted cloud search as a service} [online].
 2017 [cit. 2017-03-03]. Dostupné z:
@@ -1042,15 +2358,15 @@ O'Reilly Media, 2015 724~s. ISBN 978-1-4493-5854-9.
 2017 [cit. 2017-03-30]. Dostupné z: \url{https://swiftype.com/site-search}
 
 \bibitem{cloud-search} AWS. \emph{Amazon CloudSearch} [online].
-2017 [cit. 2017-03-30]. Dostupné z: \url{https://aws.amazon.com/cloudsearch/}
+2017 [cit. 2017-03-30]. Dostupné z: \url{https://aws.amazon.com/cloudsearch}
 
 \bibitem{gse} Google. \emph{Custom Search Engine} [online].
-2017 [cit. 2017-03-30]. Dostupné z: \url{https://cse.google.com/cse/}
+2017 [cit. 2017-03-30]. Dostupné z: \url{https://cse.google.com/cse}
 
 \bibitem{amazon-100ms} GigaSpaces Blog.
 \emph{Amazon found every 100ms of latency cost them 1\% in sales} [online]. \\
 2017 [cit. 2017-03-26].
-Dostupné z: \url{https://blog.gigaspaces.com/amazon-found-every-100ms-of-latency-cost-them-1-in-sales/}
+Dostupné z: \url{https://blog.gigaspaces.com/amazon-found-every-100ms-of-latency-cost-them-1-in-sales}
 
 \bibitem{stackshare-algolia} StackShare, Inc. 
 \emph{How Algolia Reduces Latency For 21B Searches Per Month} [online].\\
@@ -1067,17 +2383,17 @@ Dostupné z: \url{https://blog.gigaspaces.com/amazon-found-every-100ms-of-latenc
 2017 [cit. 2017-04-01]. Dostupné z: \url{http://www.netmonitor.cz}
 
 \bibitem{xml-heureka} Heureka Shopping s.r.o. \emph{Specifikace XML souboru} [online].\\
-2017 [cit. 2017-04-01]. Dostupné z: \url{https://sluzby.heureka.cz/napoveda/xml-feed/}
+2017 [cit. 2017-04-01]. Dostupné z: \url{https://sluzby.heureka.cz/napoveda/xml-feed}
 
 \bibitem{xml-zbozi} Seznam.cz, a.s. \emph{Specifikace XML feedu pro internetové obchody} [online].\\
 2017 [cit. 2017-04-01]. Dostupné z:
-\url{https://napoveda.seznam.cz/cz/zbozi/specifikace-xml-pro-obchody/specifikace-xml-feedu/}
+\url{https://napoveda.seznam.cz/cz/zbozi/specifikace-xml-pro-obchody/specifikace-xml-feedu}
 
 \bibitem{nejpouzivanejsi-slova} TĚŠITELOVÁ Marie. \emph{O češtině v číslech}.
 Praha: Academia, 1987 205~s.
 
 \bibitem{es-fuzziness} Elasticsearch. \emph{The Definitive Guide - Fuzziness} [online].
-2017 [cit. 2017-03-08]. Dostupné z:
+2017 [cit. 2017-04-08]. Dostupné z:
 \url{https://www.elastic.co/guide/en/elasticsearch/guide/current/fuzziness.html}.
 
 \bibitem{damerau} DAMERAU, Fred J. \emph{A Technique for Computer Detection and Correction of Spelling Errors}.
@@ -1085,7 +2401,7 @@ Communications of the ACM (ACM), 1964, s. 171–176. ISSN 0001-0782. doi: 10.114
 Dostupné z: \url{http://doi.acm.org/10.1145/363958.363994}
 
 \bibitem{n-gram} SMETANIN Nikita. \emph{Fuzzy string search} [online].
-2017 [cit. 2017-03-08]. 
+2017 [cit. 2017-04-08]. 
 Dostupné z: \url{http://ntz-develop.blogspot.cz/2011/03/fuzzy-string-search.html}.
 
 \bibitem{christen} CHRISTEN, Peter. \emph{A Comparison of Personal Name Matching: Techniques and Practical Issues}.
@@ -1094,33 +2410,80 @@ IEEE Computer Society Washington, DC, USA. doi: 10.1145/363958.363994.
 Dostupné z: \url{http://users.cecs.anu.edu.au/~Peter.Christen/publications/tr-cs-06-02.pdf}. 
 ISBN: 0-7695-2702-7.
 
+\bibitem{backend} HUS Maarten. \emph{The case for separating front- and back-end} [online].
+2014 [cit. 2017-04-11]. 
+Dostupné z: \url{http://dontpanic.42.nl/2014/10/the-case-for-separating-front-and-back.html}.
+
+\bibitem{apiary-design} Apiary. \emph{How to Build an API} [online].
+2017 [cit. 2017-04-11]. Dostupné z: \url{https://apiary.io/how-to-build-api}.
+
+\bibitem{scaling} IBM. \emph{How to explain vertical and horizontal scaling in the cloud} [online].
+2014 [cit. 2017-04-11]. Dostupné z: 
+\url{https://www.ibm.com/blogs/cloud-computing/2014/04/explain-vertical-horizontal-scaling-cloud}.
+
+\bibitem{api-blueprint} API Blueprint. \emph{A powerful high-level API description language for web APIs} [online].
+2017 [cit. 2017-04-12]. Dostupné z: \url{https://apiblueprint.org}.
+
+\bibitem{websockets} Mozilla Developer Network. \emph{WebSockets -- Web APIs} [online].
+2017 [cit. 2017-04-12]. Dostupné z: \url{https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API}.
+
+\bibitem{postgres-search} The PostgreSQL Global Development Group. 
+\emph{Documentation: Chapter 12. Full Text Search} [online].
+2017 [cit. 2017-04-12]. Dostupné z: \url{https://www.postgresql.org/docs/9.1/static/textsearch-intro.html}.
+
+\bibitem{es-analysis} Elastic. \emph{Elasticsearch Reference: Analysis} [online].
+2017 [cit. 2017-04-12]. Dostupné z: \url{https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html}.
+
+\bibitem{es-postgres} ROWE Nathaniel. 
+\emph{Performance Testing a Postgres Database vs Elasticsearch 5: Column Statistics} [online].
+2017 [cit. 2017-04-12]. Dostupné z: \url{http://blog.nrowegt.com/database-vs-elasticsearch-speed-column-statistics}.
+
+\bibitem{es-postgres-2} ROWE Nathaniel. 
+\emph{How To Use Sub Aggregations With Searchkick To Return Multiple Terms Per Document} [online].
+2017 [cit. 2017-04-12]. Dostupné z: 
+\url{http://blog.nrowegt.com/how-to-use-sub-aggregations-with-searchkick-to-return-multiple-terms-per-document}.
+
+\bibitem{solr} The Apache Software Foundation. \emph{Apache Solr} [online].
+2017 [cit. 2017-04-12]. Dostupné z: \url{http://lucene.apache.org/solr}.
+
+\bibitem{es-solr} YIGAL Asaf. \emph{Solr vs. Elasticsearch: Who’s The Leading Open Source Search Engine?} [online].
+2016 [cit. 2017-04-12]. Dostupné z: \url{https://logz.io/blog/solr-vs-elasticsearch}.
+
+\bibitem{sphinx} Sphinx Technologies Inc. \emph{Sphinx Search} [online].
+2017 [cit. 2017-04-12]. Dostupné z: \url{http://sphinxsearch.com}.
+
+\bibitem{hunspell} NÉMETH László. \emph{Hunspell} [online].
+2017 [cit. 2017-04-13]. Dostupné z: \url{http://hunspell.github.io}.
+
+\bibitem{hunspell-man} Canonical Ltd. 
+\emph{Ubuntu Manpage: hunspell - format of Hunspell dictionaries and affix files} [online].
+2017 [cit. 2017-04-13]. Dostupné z: \url{http://manpages.ubuntu.com/manpages/trusty/en/man4/hunspell.4.html}.
+
+\bibitem{alpine} Alpine Linux Development Team. \emph{Alpine Linux} [online].
+2017 [cit. 2017-04-13]. Dostupné z: \url{https://alpinelinux.org}.
+
+\bibitem{alpine-lean} WALLIN Marko. \emph{Lean Docker Containers with Alpine Linux} [online].
+2017 [cit. 2017-04-13]. Dostupné z: \url{https://gofore.com/en/lean-docker-alpine-linux}.
+
+\bibitem{circleci} CircleCI. \emph{Continuous Integration and Delivery} [online].
+2017 [cit. 2017-04-14]. Dostupné z: \url{https://circleci.com}.
+
+\bibitem{compose} DOCKER. \emph{Compose: Define and run multi-container applications with Docker} [online].
+2017 [cit. 2017-04-14]. Dostupné z: \url{https://github.com/docker/compose}.
+
+\bibitem{wordnet} European Language Resources Association. \emph{Czech WordNet} [online].
+2017 [cit. 2017-04-17]. Dostupné z: \url{http://catalog.elra.info/product_info.php?products_id=1089}.
+
+\bibitem{hunspell-download} Apache OpenOffice. \emph{Index of /contrib/dictionaries} [online].
+2017 [cit. 2017-04-17]. Dostupné z: \url{http://download.services.openoffice.org/contrib/dictionaries}.
+
+\bibitem{es-suggester} ELASTIC. \emph{Completion Suggester} [online].
+2017 [cit. 2017-04-17]. Dostupné z: 
+\url{https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters-completion.html}.
+
+
+
 \end{thebibliography}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter*{Rejstřík}
-...
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\appendix
-
-\chapter{Obsah přiloženého DVD}
-
-\begin{itemize}
-\item Soubor Diplomova\_prace\_2017\_Ludek\_Vesely.pdf
-\begin{itemize}
-	\item Text diplomové práce
-\end{itemize}
-
-\end{itemize}
-
-
-%\chapter{Graf jako příloha}
-%\begin{figure}[h]
-%\center
-%\includegraphics[width=0.86\textwidth]{todo.pdf}
-%\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
