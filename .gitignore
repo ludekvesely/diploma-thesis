@@ -8,9 +8,6 @@ texput.log
 *.bak
 .DS_Store
 _minted-thesis
-
 thesis.lof
-
 thesis.lol
-
 thesis.lot
